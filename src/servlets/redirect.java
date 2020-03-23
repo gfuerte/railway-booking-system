@@ -45,7 +45,7 @@ public class redirect extends HttpServlet {
 		try {
 
 			//Get the database connection
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/BarBeerDrinkerSample";
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			
 			Class.forName("com.mysql.jdbc.Driver");
 			
@@ -59,7 +59,7 @@ public class redirect extends HttpServlet {
 			String pswd = request.getParameter("pswd");
 			
 			//Make a SELECT query from the table to see if user exists
-			String search = "SELECT * FROM Assignment3.login WHERE username = ? AND password = ?";
+			String search = "SELECT * FROM RailwayBookingSystem.Customer WHERE username = ? AND password = ?";
 			
 			//Create Prepared Statement
 			PreparedStatement ps = con.prepareStatement(search);
@@ -95,7 +95,7 @@ public class redirect extends HttpServlet {
 			}
 			else {
 				if (!result.isBeforeFirst() ) {    
-					String insert = "INSERT INTO Assignment3.login (username, password) VALUES (?, ?)";
+					String insert = "INSERT INTO RailwayBookingSystem.Customer (username, password) VALUES (?, ?)";
 					
 					//Create Prepared Statement
 					PreparedStatement ps2 = con.prepareStatement(insert);
