@@ -4,10 +4,10 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Login</title>
+<title>Login Representative</title>
 </head>
 <body>
-Welcome ${Name}! Successful Login
+Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <form method="get" action="${pageContext.request.contextPath}/redirect">
 <input type="submit" name = "logoutButton" value="logout">
 </form>
