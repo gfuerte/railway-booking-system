@@ -32,7 +32,7 @@ public class redirect extends HttpServlet {
 		if(request.getParameter("logoutButton")!= null){
 			HttpSession session=request.getSession();  
 			session.invalidate();
-			RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
         	dispatcher.forward(request, response);
 		}
 	}
@@ -48,7 +48,7 @@ public class redirect extends HttpServlet {
 			HttpSession session=request.getSession();  
 			session.invalidate();
 			request.setAttribute("message", "");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
         	dispatcher.forward(request, response);
 		}
 		
@@ -60,7 +60,7 @@ public class redirect extends HttpServlet {
 			
 			Class.forName("com.mysql.jdbc.Driver");
 			
-			Connection con = DriverManager.getConnection(url,"admin","password");
+			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
 
 			//determine redirect
 			if(request.getParameter("LoginButton") != null) {
@@ -84,7 +84,7 @@ public class redirect extends HttpServlet {
 				if(user.isEmpty() || pswd.isEmpty()) {
 					String message = user.isEmpty() ? "Please fill out a username" : "Please fill out a password";
 				    request.setAttribute("message", message);
-				    RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
 		            dispatcher.forward(request, response);
 		            return;
 				}
@@ -97,7 +97,7 @@ public class redirect extends HttpServlet {
 				if (!result.isBeforeFirst() ) {    
 					String message = "Invalid login";
 				    request.setAttribute("message", message);
-				    RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
 		            dispatcher.forward(request, response);
 				} 
 				else {
@@ -120,10 +120,12 @@ public class redirect extends HttpServlet {
 				}
 			}
 			else if(request.getParameter("CustomerButton") != null) {
+				request.setAttribute("message", "");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/Login/customerSignUp.jsp");
             	dispatcher.forward(request, response);
 			}
 			else if(request.getParameter("RepButton") != null) {
+				request.setAttribute("message", "");
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/Login/repSignUp.jsp");
             	dispatcher.forward(request, response);
 			}
