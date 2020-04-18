@@ -40,17 +40,23 @@ public class QA extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
-		
-		
+
+
 		if (request.getParameter("goBack") != null ) {    //return button
 			request.setAttribute("message", "");
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
-        	dispatcher.forward(request, response);
+			dispatcher.forward(request, response);
 		}
-		
+
+		else if (request.getParameter("goBackR") != null ) {    //return button
+			request.setAttribute("message", "");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/loginRepresentative.jsp");
+			dispatcher.forward(request, response);
+		}
+
 	}
-	
-	
+
+
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -58,8 +64,8 @@ public class QA extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
+
 		if(request.getParameter("searchButton") != null) {
-			ResultSet result = null;
 			try {
 
 				//Get the database connection
@@ -70,8 +76,6 @@ public class QA extends HttpServlet {
 				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
 
 
-				//Create a SQL statement
-				Statement stmt = con.createStatement();
 
 				//Get HTML Params
 				String user = (String) request.getSession(false).getAttribute("Name");
@@ -82,6 +86,8 @@ public class QA extends HttpServlet {
 				//Create Prepared Statement
 				String srch = request.getParameter("Search");
 				PreparedStatement ps = con.prepareStatement(search);
+
+
 				ps.setString(1, user);
 				ps.setString(2, "%" + srch + "%");
 
@@ -97,7 +103,6 @@ public class QA extends HttpServlet {
 					String Owner = rs.getString("Owner");
 
 
-					Statement stmt2 = con.createStatement();
 
 					//Get HTML Params
 
@@ -135,11 +140,225 @@ public class QA extends HttpServlet {
 			}
 		}
 
+		else if(request.getParameter("QAR") != null) {
+			try {
+
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+				Class.forName("com.mysql.jdbc.Driver");
+
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+
+
+
+				//Make a SELECT query from the table to see if user exists
+				String search = "SELECT * FROM RailwayBookingSystem.Question";
+
+				//Create Prepared Statement
+				String srch = request.getParameter("Search");
+				PreparedStatement ps = con.prepareStatement(search);
+
+				ResultSet rs = ps.executeQuery();
+
+
+				ArrayList<QAPair> listQs = new ArrayList<>();
+
+				while (rs.next()) 
+				{  
+					String Text = rs.getString("Text");  
+					String UUID = rs.getString("UUID");
+					String Owner = rs.getString("Owner");
+
+
+					//Get HTML Params
+
+					//Make a SELECT query from the table to see if user exists
+					String search2 = "SELECT * FROM RailwayBookingSystem.Answer WHERE UUID = ?";
+
+					//Create Prepared Statement
+					PreparedStatement ps2 = con.prepareStatement(search2);
+					ps2.setString(1, UUID);
+
+					ResultSet rs2 = ps2.executeQuery();
+
+
+					if(!rs2.isBeforeFirst()) {
+						QAPair q = new QAPair(Text, "None", Owner, "None", UUID);
+						listQs.add(q);
+					}
+
+					System.out.println(Text);
+				} 
+
+				request.setAttribute("list", listQs);
+				request.setAttribute("filter", srch);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/messageRep.jsp");
+				dispatcher.forward(request, response);
+
+			}catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		else if(request.getParameter("searchButtonR") != null) {
+			try {
+
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+				Class.forName("com.mysql.jdbc.Driver");
+
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+
+
+				//Make a SELECT query from the table to see if user exists
+				String search = "SELECT * FROM RailwayBookingSystem.Question WHERE Text COLLATE LATIN1_GENERAL_CI LIKE ?";
+
+				//Create Prepared Statement
+				String srch = request.getParameter("SearchR");
+				PreparedStatement ps = con.prepareStatement(search);
+
+				ps.setString(1, "%" + srch + "%");
+
+
+				ResultSet rs = ps.executeQuery();
+
+
+				ArrayList<QAPair> listQs = new ArrayList<>();
+
+				while (rs.next()) 
+				{  
+					String Text = rs.getString("Text");  
+					String UUID = rs.getString("UUID");
+					String Owner = rs.getString("Owner");
+
+
+
+					//Get HTML Params
+
+					//Make a SELECT query from the table to see if user exists
+					String search2 = "SELECT * FROM RailwayBookingSystem.Answer WHERE UUID = ?";
+
+					//Create Prepared Statement
+					PreparedStatement ps2 = con.prepareStatement(search2);
+					ps2.setString(1, UUID);
+
+					ResultSet rs2 = ps2.executeQuery();
+
+
+					if(!rs2.isBeforeFirst()) {
+						QAPair q = new QAPair(Text, "None", Owner, "None", UUID);
+						listQs.add(q);
+					}
+
+					System.out.println(Text);
+				} 
+
+				request.setAttribute("list", listQs);
+				request.setAttribute("filter", srch);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/messageRep.jsp");
+				dispatcher.forward(request, response);
+
+			}catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		else if(request.getParameter("questionButtonR") != null) {
+			String ans = request.getParameter("AnswerR");
+			String rad = request.getParameter("Questions");
+
+			if(rad == null || ans.isEmpty()) {
+				request.setAttribute("message", "Please select a question to answer and type it in the answer box!");
+			}
+			else {
+				try {
+					//Get the database connection
+					String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+					Class.forName("com.mysql.jdbc.Driver");
+
+					Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+					//Make a SELECT query from the table to see if user exists
+					String updt = "INSERT INTO RailwayBookingSystem.Answer(`UUID`,`Text`,`Owner`) VALUES (?,?,?)";
+
+					//Create Prepared Statement
+					PreparedStatement psU = con.prepareStatement(updt);
+					psU.setString(1, rad);
+					psU.setString(2, ans);
+					psU.setString(3, (String)request.getSession(false).getAttribute("Name"));
+
+					psU.executeUpdate();
+					;
+				}catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+
+
+			//search all again
+			try {
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+				Class.forName("com.mysql.jdbc.Driver");
+
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+
+				//Make a SELECT query from the table to see if user exists
+				String search = "SELECT * FROM RailwayBookingSystem.Question";
+
+				//Create Prepared Statement
+				String srch = request.getParameter("Search");
+				PreparedStatement ps = con.prepareStatement(search);
+
+				ResultSet rs = ps.executeQuery();
+
+
+				ArrayList<QAPair> listQs = new ArrayList<>();
+
+				while (rs.next()) 
+				{  
+					String Text = rs.getString("Text");  
+					String UUID = rs.getString("UUID");
+					String Owner = rs.getString("Owner");
+
+					//Get HTML Params
+
+					//Make a SELECT query from the table to see if user exists
+					String search2 = "SELECT * FROM RailwayBookingSystem.Answer WHERE UUID = ?";
+
+					//Create Prepared Statement
+					PreparedStatement ps2 = con.prepareStatement(search2);
+					ps2.setString(1, UUID);
+
+					ResultSet rs2 = ps2.executeQuery();
+
+
+					if(!rs2.isBeforeFirst()) {
+						QAPair q = new QAPair(Text, "None", Owner, "None", UUID);
+						listQs.add(q);
+					}
+
+					System.out.println(Text);
+				} 
+
+				request.setAttribute("list", listQs);
+				request.setAttribute("filter", srch);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/messageRep.jsp");
+				dispatcher.forward(request, response);
+
+			}catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
 		else {
-
-
-
-			ResultSet result = null;
 			try {
 
 				//Get the database connection
@@ -151,11 +370,8 @@ public class QA extends HttpServlet {
 
 
 				if(request.getParameter("questionButton") != null) {
-					//Create a SQL statement
-					Statement updateStatement = con.createStatement();
 
-					//Get HTML Params
-					String Owner = (String) request.getSession(false).getAttribute("Name");
+					request.getSession(false).getAttribute("Name");
 					String Text = request.getParameter("Question");
 
 					//Make a SELECT query from the table to see if user exists
@@ -171,8 +387,6 @@ public class QA extends HttpServlet {
 
 				}
 
-				//Create a SQL statement
-				Statement stmt = con.createStatement();
 
 				//Get HTML Params
 				String user = (String) request.getSession(false).getAttribute("Name");
@@ -196,7 +410,6 @@ public class QA extends HttpServlet {
 					String Owner = rs.getString("Owner");
 
 
-					Statement stmt2 = con.createStatement();
 
 					//Get HTML Params
 
