@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import POJOs.Alert;
 import POJOs.QAPair;
 
 /**
@@ -64,8 +65,29 @@ public class QA extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
-
-		if(request.getParameter("searchButton") != null) {
+		if(request.getParameter("Alerts") != null) {
+			
+			//get list of Alerts that is found by searching reservations for customer username and finding route and then checking 
+			//if alerts table has route in it along with the date information
+			
+			Alert a = new Alert("Delay Route #570", "1/2/2020");
+			Alert b = new Alert("Delay Route #571", "1/3/2020");
+			ArrayList<Alert> as = new ArrayList<>();
+			as.add(a);
+			as.add(b);
+			
+			request.setAttribute("list", as);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/alertCustomer.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("AlertsR") != null) {
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/alertRep.jsp");
+			dispatcher.forward(request, response);
+			
+		}
+		
+		else if(request.getParameter("searchButton") != null) {
 			try {
 
 				//Get the database connection
