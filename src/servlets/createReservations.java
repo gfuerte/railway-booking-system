@@ -41,11 +41,6 @@ public class createReservations extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
-		if(request.getParameter("Reservations") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservations.jsp");
-			dispatcher.forward(request, response);
-		}
-		
 		if(request.getParameter("goBack") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 			dispatcher.forward(request, response);
@@ -57,8 +52,9 @@ public class createReservations extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+
 		if(request.getParameter("Reservations") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservations.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");
 			dispatcher.forward(request, response);
 		}
 	}

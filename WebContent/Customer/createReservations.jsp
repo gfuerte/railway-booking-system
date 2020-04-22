@@ -10,7 +10,7 @@
 
 	<p>test</p>
 
-	<form method="get" action="${pageContext.request.contextPath}/QA">
+	<form method="get" action="${pageContext.request.contextPath}/createReservations">
 	<input type="submit" name = "goBack" value="Exit">
 	
 </form>
