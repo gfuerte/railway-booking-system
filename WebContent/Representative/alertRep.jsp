@@ -4,12 +4,12 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Login</title>
+<title>Alerts</title>
 </head>
 <body>
-Welcome ${Name}! Successful Login
-<form method="get" action="${pageContext.request.contextPath}/redirect">
-<input type="submit" name = "logoutButton" value="logout">
+INSERT ALERT SELECTION PER ROUTE HERE
+<form method="get" action="${pageContext.request.contextPath}/QA">
+<input type="submit" name = "goBackR" value="Exit">
 </form>
 </body>
 </html>
