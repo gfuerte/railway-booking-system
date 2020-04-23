@@ -25,6 +25,10 @@ Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <input type ="submit" name = "Reservations" value = "Create Reservations">
 </form>
 <br><br>
+<form action = "${pageContext.request.contextPath}/search" method = "post">
+<input type ="submit" name = "Schedules" value = "See Schedules">
+</form>
+<br><br>
 <form method="get" action="${pageContext.request.contextPath}/redirect">
 <input type="submit" name = "logoutButton" value="logout">
 </form>
