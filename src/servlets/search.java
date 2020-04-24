@@ -2,6 +2,8 @@ package servlets;
 import java.io.*;
 import java.util.*;
 import java.sql.*;
+import java.sql.Date;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -14,6 +16,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import POJOs.Alert;
+import POJOs.TrainSchedule;
 
 /**
  * Servlet implementation class search
@@ -49,6 +54,40 @@ public class search extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
+		
+		try {
+			//Get the database connection
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+			
+		    Statement stmt = con.createStatement();
+		    ResultSet all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule");
+		    
+			ArrayList<TrainSchedule> trains = new ArrayList<>();
+		    
+		    while(all.next()) {
+		    	int trainnum = all.getInt("Train");
+		    	String origin = all.getString("Origin");
+		    	String destination = all.getString("Destination");
+		    	Date arrival = all.getDate("Arrival Datetime");
+		    	Date departure = all.getDate("Departure Datetime");
+		    	Double fare = all.getDouble("Fare");
+		    	String transitline = all.getString("Transit Line");
+		    	
+		    	trains.add(new TrainSchedule(trainnum, origin, destination, arrival, departure, fare, transitline));
+		    	
+		    }
+		    
+		    request.setAttribute("list", trains);
+			
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
 		if(request.getParameter("Schedules") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/schedule.jsp");
 			dispatcher.forward(request, response);
