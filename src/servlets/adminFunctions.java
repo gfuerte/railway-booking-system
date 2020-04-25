@@ -25,9 +25,9 @@ public class adminFunctions extends HttpServlet{
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
-		if(request.getParameter("lol") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
-			dispatcher.forward(request, response);
+		if(request.getParameter("goBack") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/loginAdmin.jsp");
+			dispatcher.forward(request, response);  
 		}
 	}
 

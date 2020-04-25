@@ -8,8 +8,8 @@
 </head>
 <body>
 INSERT EDIT INFO SECTION HERE
-<form method="get" action="${pageContext.request.contextPath}/QA">
-<input type="submit" name = "goBackR" value="Exit">
+<form method="get" action="${pageContext.request.contextPath}/adminFunctions">
+<input type="submit" name = "goBack" value="Exit">
 </form>
 </body>
 </html>
