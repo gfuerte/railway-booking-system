@@ -1,19 +1,17 @@
 package POJOs;
 
-import java.sql.Date;
-
 public class TrainSchedule {
 
 	
 	public int trainnum;
 	public String origin;
 	public String destination;
-	public Date arrival;
-	public Date departure;
+	public String arrival;
+	public String departure;
 	public Double fare;
 	public String transitline;
 	
-	public TrainSchedule(int t, String o, String d, Date a, Date de, Double f, String tl) {
+	public TrainSchedule(int t, String o, String d, String a, String de, Double f, String tl) {
 		trainnum = t;
 		origin = o;
 		destination = d;
@@ -36,11 +34,11 @@ public class TrainSchedule {
 		return destination;
 	}
 	
-	public Date getArrival() {
+	public String getArrival() {
 		return arrival;
 	}
 	
-	public Date getDeparture() {
+	public String getDeparture() {
 		return departure;
 	}
 	
