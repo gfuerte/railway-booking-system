@@ -22,6 +22,7 @@ Please login below
 		<input type="submit" name = "CustomerButton" value="Customer Signup">
 		<input type="submit" name = "RepButton" value="Representative Signup">
 	</form>
+<br>
 	<br>${message}<br>
 <br>
 </body>
