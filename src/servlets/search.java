@@ -99,8 +99,8 @@ public class search extends HttpServlet {
 		    	int trainnum = all.getInt("train");
 		    	String origin = all.getString("origin");
 		    	String destination = all.getString("destination");
-		    	String arrival = ft.format(all.getDate("arrivalDatetime"));
-		    	String departure = ft.format(all.getDate("departureDatetime"));
+		    	String arrival = ft.format(all.getTimestamp("arrivalDatetime"));
+		    	String departure = ft.format(all.getTimestamp("departureDatetime"));
 		    	Double fare = all.getDouble("fare");
 		    	String transitline = all.getString("transitLine");
 		    	
