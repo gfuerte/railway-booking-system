@@ -53,12 +53,36 @@ public class adminFunctions extends HttpServlet{
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
-		if(request.getParameter("ModifyInfo") != null) {
+		if(request.getParameter("ModifyCusInfo") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/editInfo.jsp");
 			dispatcher.forward(request, response);
 		}
-		else if(request.getParameter("MonthSales") != null) {
+		else if(request.getParameter("ModifyEmpInfo") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/editInfo.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("getMonthlySales") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/monthlySale.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("getReservationListT") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/reservationList.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("getReservationListCn") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/reservationList.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("getRevenueListTl") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("getRevenueListDc") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
+			dispatcher.forward(request, response);
+		}
+		else if(request.getParameter("getRevenueListCn") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
 			dispatcher.forward(request, response);
 		}
 	}
