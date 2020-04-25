@@ -30,10 +30,10 @@ Sort by:
 <br><br>
 	<form method="post" action="${pageContext.request.contextPath}/search">
 	<table>
-    	<input type="submit" name = "sortarrival" value="Arrival">
-    	<input type="submit" name = "sortdeparture" value="Departure">
-    	<input type="submit" name = "sortorigin" value="Origin">
+	    <input type="submit" name = "sortorigin" value="Origin">
     	<input type="submit" name = "sortdestination" value="Destination">
+	    <input type="submit" name = "sortdeparture" value="Departure">
+    	<input type="submit" name = "sortarrival" value="Arrival">
     	<input type="submit" name = "sortfare" value="Fare">
 	</table>
 	</form>
@@ -44,8 +44,8 @@ Sort by:
         	<th>Train Number</th>
             <th>Origin</th>
             <th>Destination</th>
-            <th>Arrival Time</th>
             <th>Departure Time</th>
+            <th>Arrival Time</th>
             <th>Fare</th>
             <th>Transit Line</th>
         </tr>
@@ -54,8 +54,8 @@ Sort by:
             	<td><c:out value="${x.trainnum}" /></td>
                 <td><c:out value="${x.origin}" /></td>
                 <td><c:out value="${x.destination}" /></td>
-                <td><c:out value="${x.arrival}" /></td>
                 <td><c:out value="${x.departure}" /></td>
+                <td><c:out value="${x.arrival}" /></td>
                 <td><c:out value="${x.fare}" /></td>
                 <td><c:out value="${x.transitline}" /></td>    
              </tr>

@@ -68,29 +68,63 @@ public class search extends HttpServlet {
 			Statement stmt = con.createStatement();
 			ResultSet all;
 			
+			String query = "SELECT * FROM RailwayBookingSystem.Schedule";
+			
+			if (request.getParameter("searchconditions") != null) {
+				String date = request.getParameter("date");
+				String origin = request.getParameter("origin");
+				String destination = request.getParameter("destination");
+				
+				query = "SELECT * FROM RailwayBookingSystem.Schedule";
+				
+				if (!date.isEmpty() || !origin.isEmpty() || !destination.isEmpty()) {
+					query += " WHERE";
+				}
+				
+				if (!date.isEmpty()) {
+					query += " departureDatetime like \"" + date + "%\""; 
+				}
+				
+				if (!origin.isEmpty()) {
+					if (!date.isEmpty()) {
+						query += " AND origin = \"" + origin  + "\"";
+					} else {
+						query += " origin = \"" + origin + "\"";
+					}
+				}
+				
+				if (!destination.isEmpty()) {
+					if (!date.isEmpty() || !origin.isEmpty()) {
+						query += " AND destination = \"" + destination + "\"";
+					} else {
+						query += " destination = \"" + destination + "\"";						
+					}
+				}
+			} 
+			
 			if (request.getParameter("sortarrival") != null) {
 				
-				all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule ORDER BY arrivalDatetime");
+				all = stmt.executeQuery(query + " ORDER BY arrivalDatetime");
 				
 			} else if (request.getParameter("sortdeparture") != null) {
 
-				all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule ORDER BY departureDatetime");
+				all = stmt.executeQuery(query + " ORDER BY departureDatetime");
 				
 			} else if (request.getParameter("sortorigin") != null) {
 				
-				all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule ORDER BY origin");
+				all = stmt.executeQuery(query + " ORDER BY origin");
 				
 			} else if (request.getParameter("sortdestination") != null) {
 				
-				all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule ORDER BY destination");
+				all = stmt.executeQuery(query + " ORDER BY destination");
 				
 			} else if (request.getParameter("sortfare") != null) {
 				
-				all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule ORDER BY fare");
+				all = stmt.executeQuery(query + " ORDER BY fare");
 				
 			} else {
 				
-				all = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Schedule");
+				all = stmt.executeQuery(query);
 			}
 				
 			ArrayList<TrainSchedule> trains = new ArrayList<>();
