@@ -20,6 +20,9 @@ Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <form action = "${pageContext.request.contextPath}/QA" method = "post">
 <input type ="submit" name = "AlertsR" value = "Alerts">
 </form>
+<form action = "${pageContext.request.contextPath}/repFunctions" method = "post">
+<input type ="submit" name = "Reservations" value = "Reservations">
+</form>
 <br><br>
 <form method="get" action="${pageContext.request.contextPath}/redirect">
 <input type="submit" name = "logoutButton" value="logout">
