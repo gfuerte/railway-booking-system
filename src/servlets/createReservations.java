@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-import entities.Reservation;
+import POJOs.Reservation;
 import POJOs.TrainSchedule;
 /**
  * Servlet implementation class createReservations
