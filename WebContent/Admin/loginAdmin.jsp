@@ -16,6 +16,14 @@ Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <br><br>
 
 <body>
+Add New User:
+<form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
+<input type ="submit" name = "AddCus" value = "Add New Customer ">
+<input type ="submit" name = "AddEmp" value = "Add New Customer Representative">
+</form>
+<br><br>
+
+<body>
 Modify User Information:
 <br>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
@@ -50,12 +58,9 @@ Modify User Information:
 </form>
 <br><br>
 
+<body>
+Listing of Revenue Per:
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
-<table>
-<tr>    
-<td>List Revenue By:</td><td><input type="text" name="info2"></td>
-</tr>
-</table>
 <input type ="submit" name = "getRevenueListTl" value = "Transit Line">
 <input type ="submit" name = "getRevenueListDc" value = "Destination City">
 <input type ="submit" name = "getRevenueListCn" value = "CustomerName">
