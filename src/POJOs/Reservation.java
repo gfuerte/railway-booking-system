@@ -6,7 +6,6 @@ public class Reservation {
 	String cUsername;
 	String rUsername;
 	String date;
-	boolean delay;
 	
 	public Reservation(String rid, Double fare, String cUsername, String rUsername, String date) {
 		this.rid = rid;
@@ -14,7 +13,6 @@ public class Reservation {
 		this.cUsername = cUsername;
 		this.rUsername = rUsername;
 		this.date = date;
-		this.delay = false;
 	}
 	
 	public String getrid() { return this.rid; }
@@ -31,8 +29,5 @@ public class Reservation {
 	
 	public String getdate() { return this.date; }
 	public void setdate(String date) { this.date = date; }
-	
-	public boolean getdelay() { return this.delay; }
-	public void setdelay(boolean delay) { this.delay = delay; }
-	
+
 }
