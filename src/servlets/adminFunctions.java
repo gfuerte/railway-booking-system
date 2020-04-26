@@ -70,23 +70,11 @@ public class adminFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/monthlySale.jsp");
 			dispatcher.forward(request, response);
 		}
-		else if(request.getParameter("getReservationListT") != null) {
+		else if(request.getParameter("getReservations") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/reservationList.jsp");
 			dispatcher.forward(request, response);
 		}
-		else if(request.getParameter("getReservationListCn") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/reservationList.jsp");
-			dispatcher.forward(request, response);
-		}
-		else if(request.getParameter("getRevenueListTl") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
-			dispatcher.forward(request, response);
-		}
-		else if(request.getParameter("getRevenueListDc") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
-			dispatcher.forward(request, response);
-		}
-		else if(request.getParameter("getRevenueListCn") != null) {
+		else if(request.getParameter("getRevenues") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
 			dispatcher.forward(request, response);
 		}

@@ -1,35 +1,63 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>${Month} Sales Report</title>
-</head>
-<body>
-<div align="center">
-        <form method="post" action="${pageContext.request.contextPath}/QA">	
-        <table border="1" cellpadding="5">
-            <caption><h2>${Month} Sales Report</h2></caption>
-            <tr>
-            	<th>Reservation ID</th>
-                <th>Date</th>
-                <th>Fare</th>
-            </tr>
-            
-            <c:forEach var="qa" items="${list}">
-                <tr>
-                    <td><input type="radio" name="Questions" value = "${qa.uuid}"/></td>
-                    <td><c:out value="${qa.question}" /></td>
-                    <td><c:out value="${qa.qauthor}" /></td>
-                </tr>
-            </c:forEach>
-            
-        </table>
-        </form>
-        <br>${message}<br>
-</div>
-
-</body>
-</html>
+<%@ page import="java.io.*,java.util.*,java.sql.*"%>
+<%@ page import="javax.servlet.http.*,javax.servlet.*"%>
+<HTML>
+    <BODY>
+<%
+    try
+    {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+        Connection conn = DriverManager.getConnection(url,"admin","dbgroup20");
+        Statement statement=conn.createStatement();
+        String query = "SELECT * FROM Reservations WHERE MONTH(date) = ";
+        if(request.getParameter("month").equals("January")){query += "1";}
+        else if(request.getParameter("month").equals("February")){query += "2";}
+        else if(request.getParameter("month").equals("March")){query += "3";}
+        else if(request.getParameter("month").equals("April")){query += "4";}
+        else if(request.getParameter("month").equals("May")){query += "5";}
+        else if(request.getParameter("month").equals("June")){query += "6";}
+        else if(request.getParameter("month").equals("July")){query += "7";}
+        else if(request.getParameter("month").equals("August")){query += "8";}
+        else if(request.getParameter("month").equals("September")){query += "9";}
+        else if(request.getParameter("month").equals("October")){query += "10";}
+        else if(request.getParameter("month").equals("November")){query += "11";}
+        else if(request.getParameter("month").equals("December")){query += "12";}
+        
+        ResultSet output = statement.executeQuery(query);
+        %>
+            <TABLE BORDER="1">
+                <TR>
+                    <TH>Reservation ID</TH>
+                    <TH>Date</TH>
+                    <TH>Username</TH>
+                    <TH>Fare</TH>
+                </TR>
+        <%
+        while(output.next())
+        {
+            %>
+                <TR>
+                        <TD> <%= output.getString("rid") %></TD>
+                        <TD> <%= output.getString("date") %></TD>
+                        <TD> <%= output.getString("usernameCustomer") %></TD>
+                        <TD> <%= output.getString("fare") %></TD>
+                </TR>
+            <%
+        }
+        %>
+            </TABLE>
+	<form method="get" action="${pageContext.request.contextPath}/adminFunctions">
+		<input type="submit" name = "goBack" value="Return">
+	</form>
+                </BODY>
+            </HTML>
+        <%
+        output.close();
+        statement.close();
+        conn.close();
+    }
+    catch(Exception e)
+    {
+        out.print(e);
+    }
+%>

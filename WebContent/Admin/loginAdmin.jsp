@@ -24,12 +24,13 @@ Add New User:
 <br><br>
 
 <body>
-Modify User Information:
+Modify/Delete User:
 <br>
+
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <table>
 <tr>    
-<td>Type in the username of the user you wish to modify:</td><td><input type="text" name="month"></td>
+<td>Enter User's Username:</td><td><input type="text" name="modifyusername"></td>
 </tr>
 </table>
 <input type ="submit" name = "ModifyCusInfo" value = "Modify Customer Information">
@@ -37,33 +38,39 @@ Modify User Information:
 </form>
 <br><br>
 
+<body>
+Generate Monthly Sales Report:
+<br>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <table>
 <tr>    
-<td>Monthly Sale Report for:</td><td><input type="text" name="month"></td>
+<td>Month:</td><td><input type="text" name="month"></td>
 </tr>
 </table>
-<input type ="submit" name = "getMonthlySales" value = "Get Monthly Sales">
+<input type ="submit" name = "getMonthlySales" value = "Go">
 </form>
 <br><br>
 
+<body>
+List Reservations By:
+<select id="optionsRevenue">
+  <option value="tltn">Transit Line and Train Number</option>
+  <option value="cn">Customer Name</option>
+</select>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
-<table>
-<tr>    
-<td>List Reservations By:</td><td><input type="text" name="info1"></td>
-</tr>
-</table>
-<input type ="submit" name = "getReservationListT" value = "Transit Line and Train Number">
-<input type ="submit" name = "getReservationListCn" value = "Customer Name">
+<input type ="submit" name = "getReservations" value = "Go">
 </form>
 <br><br>
 
 <body>
 Listing of Revenue Per:
+<select id="optionsRevenue">
+  <option value="tl">Transit Line</option>
+  <option value="dc">Destination City</option>
+  <option value="cn2">Customer Name</option>
+</select>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
-<input type ="submit" name = "getRevenueListTl" value = "Transit Line">
-<input type ="submit" name = "getRevenueListDc" value = "Destination City">
-<input type ="submit" name = "getRevenueListCn" value = "CustomerName">
+<input type ="submit" name = "getRevenues" value = "Go">
 </form>
 <br><br>
 
