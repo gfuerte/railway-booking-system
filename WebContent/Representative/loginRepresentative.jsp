@@ -14,15 +14,23 @@ form {
 <body>
 Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <br>
+
 <form action = "${pageContext.request.contextPath}/QA" method = "post">
 <input type ="submit" name = "QAR" value = "Questions">
 </form>
+
 <form action = "${pageContext.request.contextPath}/QA" method = "post">
 <input type ="submit" name = "AlertsR" value = "Alerts">
 </form>
-<form action = "${pageContext.request.contextPath}/repFunctions" method = "post">
-<input type ="submit" name = "Reservations" value = "Reservations">
+
+<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
+<input type ="submit" name = "viewReservationsR" value = "Reservations">
 </form>
+
+<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
+<input type ="submit" name = "viewSchedulesR" value = "Train Schedules">
+</form>
+
 <br><br>
 <form method="get" action="${pageContext.request.contextPath}/redirect">
 <input type="submit" name = "logoutButton" value="logout">

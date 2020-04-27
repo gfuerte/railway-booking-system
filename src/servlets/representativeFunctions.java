@@ -19,44 +19,55 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import POJOs.TrainSchedule;
+import POJOs.Alert;
+import POJOs.Reservation;
+
 /**
  * Servlet implementation class adminFunctions
  */
-@WebServlet("/repFunctions")
-public class repFunctions extends HttpServlet{
+@WebServlet("/representativeFunctions")
+public class representativeFunctions extends HttpServlet{
 	private static final long serialVersionUID = 1L;
     
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public repFunctions() {
+    public representativeFunctions() {
         super();
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
-		if(request.getParameter("goBack") != null) {
+		// Go back to main Representative Screen
+		if(request.getParameter("returnToMainR") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/loginRepresentative.jsp");
-			dispatcher.forward(request, response);  
+			dispatcher.forward(request, response);
 		}
+		
 	}
-
+    
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-
-		if(request.getParameter("Reservations") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/reservationRep.jsp");
+		
+		// View Reservations
+		if(request.getParameter("viewReservationsR") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
 			dispatcher.forward(request, response);
 		}
+		
+		// View Train Schedules
+		if(request.getParameter("viewSchedulesR") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
+			dispatcher.forward(request, response);
+		}
+		
 	}
 
 }
