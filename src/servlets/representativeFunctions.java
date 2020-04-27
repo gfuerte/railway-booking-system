@@ -48,6 +48,12 @@ public class representativeFunctions extends HttpServlet{
 			dispatcher.forward(request, response);
 		}
 		
+		// Go back to View Train Schedule Menu
+		if(request.getParameter("returnToScheduleViewR") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
+			dispatcher.forward(request, response);
+		}
+		
 	}
     
 	/**
@@ -65,6 +71,18 @@ public class representativeFunctions extends HttpServlet{
 		// View Train Schedules
 		if(request.getParameter("viewSchedulesR") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		// Add Train Schedule Menu
+		if(request.getParameter("addScheduleR") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		// Submit Add Train Schedule
+		if(request.getParameter("submitAddScheduleR") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
 			dispatcher.forward(request, response);
 		}
 		

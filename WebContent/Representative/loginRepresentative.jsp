@@ -13,7 +13,7 @@ form {
 </head>
 <body>
 Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
-<br>
+<br><br>
 
 <form action = "${pageContext.request.contextPath}/QA" method = "post">
 <input type ="submit" name = "QAR" value = "Questions">
@@ -35,5 +35,6 @@ Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <form method="get" action="${pageContext.request.contextPath}/redirect">
 <input type="submit" name = "logoutButton" value="logout">
 </form>
+
 </body>
 </html>
