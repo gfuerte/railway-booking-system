@@ -23,6 +23,9 @@ Please Sign Up below
 			<tr>
 				<td>Last Name</td><td><input type="text" name="lname"></td>
 			</tr>
+			<tr>
+				<td>Age</td><td><input type="text" name="age"></td>
+			</tr>
 			<tr>    
 				<td>Address</td><td><input type="text" name="address"></td>
 			</tr>
