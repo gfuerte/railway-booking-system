@@ -7,9 +7,7 @@
 <title>Add Train Schedule</title>
 </head>
 <body>
-
 <h1 align="center">Add Train Schedule</h1>
-
 <br>
 	<div align="center">
 	<form method="post" action="${pageContext.request.contextPath}/representativeFunctions">
@@ -23,9 +21,6 @@
 			<tr>    
 				<td>Transit Line</td><td><input type="text" name="transitLine"></td>
 			</tr>
-			<tr>
-				<td>Available Seats</td><td><input type="text" name="availableSeats"></td>
-			</tr>
 			<tr>    
 				<td>Stops</td><td><input type="text" name="stops"></td>
 			</tr>
@@ -34,9 +29,6 @@
 			</tr>
 			<tr>    
 				<td>Arrival Time</td><td><input type="text" name="arrivalTime"></td>
-			</tr>
-			<tr>    
-				<td>Travel Time</td><td><input type="text" name="travelTime"></td>
 			</tr>
 			<tr>    
 				<td>Fare</td><td><input type="text" name="fare"></td>
@@ -52,11 +44,7 @@
 	<form method="get" action="${pageContext.request.contextPath}/representativeFunctions">
 			<input type="submit" name = "returnToScheduleViewR" value="Return">
 	</form>
+	<br><br>${message}
 	</div>
-	
-	<br>${message}<br>
-	
-<br>
-
 </body>
 </html>
