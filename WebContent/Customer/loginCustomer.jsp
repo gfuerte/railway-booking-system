@@ -28,7 +28,7 @@ Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <form action = "${pageContext.request.contextPath}/createReservations" method = "post">
 <input type ="submit" name = "Reservations" value = "Create Reservations">
 </form>
-<form>
+<form action = "${pageContext.request.contextPath}/allReservations" method = "post">
 <input type="submit" value="Current/Past Reservations">
 </form>
 <br><br>

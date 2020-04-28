@@ -142,7 +142,7 @@ public class createReservations extends HttpServlet {
 							statement.setTimestamp(4, date);
 							statement.setInt(5, train);
 
-							//statement.executeUpdate();
+							statement.executeUpdate();
 							
 							message = "Sucessfully Created Reservation";
 						    request.setAttribute("confirmation", message);
