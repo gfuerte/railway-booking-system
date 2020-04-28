@@ -14,13 +14,13 @@
     		<h2>Train Schedule</h2>
     		<caption> Search for by: </caption>
 			<tr>    
-				<td>Date (YYYY-MM-DD)</td><td><input type="text" name="date"></td>
+				<td>Date (YYYY-MM-DD)</td><td><input type="text" name="date" value="${da}"></td>
 			</tr>
 			<tr>
-				<td>Origin</td><td><input type="text" name="origin"></td>
+				<td>Origin</td><td><input type="text" name="origin" value="${o}"></td>
 			</tr>
 			<tr>
-				<td>Destination</td><td><input type="text" name="destination"></td>
+				<td>Destination</td><td><input type="text" name="destination" value="${de}"></td>
 			</tr>
 	</table>
 	<input type="submit" name = "searchconditions" value="Search">
@@ -35,8 +35,8 @@ Or
 		View stops for train number: 
 		<select name="trainNumber">
 			<option disabled selected value="0">-- Choose Number --</option>
-			<c:forEach var="x" items="${list}">
-				<option><c:out value="${x.trainnum}" /></option>
+			<c:forEach var="s" items="${slist}">
+				<option><c:out value="${s}" /></option>
 			</c:forEach>
 		</select>
 		<input type="submit" name="showStops" value="See Stops">

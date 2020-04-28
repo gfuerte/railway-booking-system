@@ -57,6 +57,7 @@ public class search extends HttpServlet {
 
 		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
 		
+		
 		try {
 			//Get the database connection
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
@@ -64,6 +65,10 @@ public class search extends HttpServlet {
 			Class.forName("com.mysql.jdbc.Driver");
 			
 			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+			
+			String date = request.getParameter("date");
+			String sorigin = request.getParameter("origin");
+			String sdestination = request.getParameter("destination");
 			
 			Statement stmt = con.createStatement();
 			ResultSet all;
@@ -77,13 +82,8 @@ public class search extends HttpServlet {
 				String selectedtrainnum = request.getParameter("trainNumber");
 				query += " WHERE train = " + selectedtrainnum;
 			} else if (request.getParameter("searchconditions") != null) {
-				String date = request.getParameter("date");
-				String origin = request.getParameter("origin");
-				String destination = request.getParameter("destination");
 				
-				query = "SELECT * FROM RailwayBookingSystem.Schedule";
-				
-				if (!date.isEmpty() || !origin.isEmpty() || !destination.isEmpty()) {
+				if (!date.isEmpty() || !sorigin.isEmpty() || !sdestination.isEmpty()) {
 					query += " WHERE";
 				}
 				
@@ -91,25 +91,30 @@ public class search extends HttpServlet {
 					query += " departureDatetime like \"" + date + "%\""; 
 				}
 				
-				if (!origin.isEmpty()) {
+				if (!sorigin.isEmpty()) {
 					if (!date.isEmpty()) {
-						query += " AND origin = \"" + origin  + "\"";
+						query += " AND origin = \"" + sorigin  + "\"";
 					} else {
-						query += " origin = \"" + origin + "\"";
+						query += " origin = \"" + sorigin + "\"";
 					}
 				}
 				
-				if (!destination.isEmpty()) {
-					if (!date.isEmpty() || !origin.isEmpty()) {
-						query += " AND destination = \"" + destination + "\"";
+				if (!sdestination.isEmpty()) {
+					if (!date.isEmpty() || !sorigin.isEmpty()) {
+						query += " AND destination = \"" + sdestination + "\"";
 					} else {
-						query += " destination = \"" + destination + "\"";						
+						query += " destination = \"" + sdestination + "\"";						
 					}
 				}
+				
+				request.setAttribute("da", date);
+				request.setAttribute("o", sorigin);
+				request.setAttribute("de", sdestination);
 			} 
 			
+			
 			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
-
+				
 				all = stmt.executeQuery(query + " ORDER BY departureDatetime");
 				
 			} else if (request.getParameter("sortarrival") != null) {
@@ -134,9 +139,11 @@ public class search extends HttpServlet {
 			}
 			
 			ArrayList<TrainSchedule> trains = new ArrayList<TrainSchedule>();
+			
+			ArrayList<Integer> nums = new ArrayList<Integer>();
 		    
 		    while(all.next()) {
-		    	int trainnum = all.getInt("train");
+		    	Integer trainnum = all.getInt("train");
 		    	String origin = all.getString("origin");
 		    	String destination = all.getString("destination");
 		    	String arrival = ft.format(all.getTimestamp("arrivalDatetime"));
@@ -146,10 +153,14 @@ public class search extends HttpServlet {
 		    	
 		    	trains.add(new TrainSchedule(trainnum, origin, destination, arrival, departure, fare, transitline));
 		    	
+		    	if(!nums.contains(trainnum)) {
+		    		nums.add(trainnum);
+		    	}
+		    	
 		    }
 		    
-		    request.setAttribute("list", trains);
-			
+	    	request.setAttribute("list", trains);
+	    	request.setAttribute("slist", nums);	
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
