@@ -112,38 +112,6 @@ public class search extends HttpServlet {
 			}
 			
 			
-			date =  (String) request.getAttribute("date");
-			sorigin = (String) request.getAttribute("origin");
-			sdestination = (String) request.getAttribute("destination");
-			
-			if (!date.isEmpty() || !sorigin.isEmpty() || !sdestination.isEmpty()) {
-				query += " WHERE";
-			
-				if (!date.isEmpty()) {
-					query += " departureDatetime like \"" + date + "%\""; 
-					request.setAttribute("da", date);
-				}
-				
-				if (!sorigin.isEmpty()) {
-					if (!date.isEmpty()) {
-						query += " AND origin = \"" + sorigin  + "\"";
-					} else {
-						query += " origin = \"" + sorigin + "\"";
-					}
-					request.setAttribute("o", sorigin);
-				}
-				
-				if (!sdestination.isEmpty()) {
-					if (!date.isEmpty() || !sorigin.isEmpty()) {
-						query += " AND destination = \"" + sdestination + "\"";
-					} else {
-						query += " destination = \"" + sdestination + "\"";						
-					}
-					request.setAttribute("de", sdestination);
-				}
-			
-			}
-			
 			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
 				
 				query += " ORDER BY departureDatetime";
