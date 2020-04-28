@@ -127,12 +127,6 @@ public class createReservations extends HttpServlet {
 							date = new Timestamp(System.currentTimeMillis());
 							train = trains.get(i).getTrainnum();
 							
-							System.out.println("rid is: " + rid);
-							System.out.println("fare is: " + fare);
-							System.out.println("username is: " + username);
-							System.out.println("date is: " + date);
-							System.out.println("train is: " + train);
-							
 							String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fare`,`username`, `date`, `train`) VALUES (?,?,?,?,?);";
 
 							PreparedStatement statement = con.prepareStatement(insert);
@@ -146,8 +140,7 @@ public class createReservations extends HttpServlet {
 							
 							message = "Sucessfully Created Reservation";
 						    request.setAttribute("confirmation", message);
-							break;
-							
+							break;	
 						}
 					}
 				} else {
