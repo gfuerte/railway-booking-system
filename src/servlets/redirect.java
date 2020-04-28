@@ -214,12 +214,6 @@ public class redirect extends HttpServlet {
 				String phone = request.getParameter("phone");
 				String email = request.getParameter("email");
 				
-				String ageString = request.getParameter("age");
-				int age = -1;
-				if (ageString != null && !ageString.isEmpty()) {
-					if(checkAge(ageString)) age = Integer.parseInt(ageString);
-				}
-				
 				//Make a SELECT query from the table to see if user exists
 				String search = "SELECT * FROM RailwayBookingSystem.Login WHERE username = ?" ;
 				
@@ -228,8 +222,8 @@ public class redirect extends HttpServlet {
 				ps.setString(1, user);
 				
 				
-				if(user.isEmpty() || pswd.isEmpty() || fname.isEmpty() || lname.isEmpty() || age == -1 || address.isEmpty() || city.isEmpty() || state.isEmpty() || zcode.isEmpty() || phone.isEmpty() || email.isEmpty()) {
-					String message = "Please properly fill out all fields";
+				if(user.isEmpty() || pswd.isEmpty() || fname.isEmpty() || lname.isEmpty() || address.isEmpty() || city.isEmpty() || state.isEmpty() || zcode.isEmpty() || phone.isEmpty() || email.isEmpty()) {
+					String message = "Please fill out all fields";
 				    request.setAttribute("message", message);
 				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Login/customerSignUp.jsp");
 		            dispatcher.forward(request, response);
@@ -253,7 +247,7 @@ public class redirect extends HttpServlet {
 					ps.executeUpdate();
 					
 					//insert into rep
-					search = "INSERT INTO RailwayBookingSystem.Customer(LName, FName, Address, City, State, Zcode, Phone, Email, username, age) VALUES (?,?,?,?,?,?,?,?,?,?)" ;
+					search = "INSERT INTO RailwayBookingSystem.Customer(LName, FName, Address, City, State, Zcode, Phone, Email, username) VALUES (?,?,?,?,?,?,?,?,?)" ;
 					ps = con.prepareStatement(search);
 					ps.setString(1, lname);
 					ps.setString(2, fname);
@@ -264,7 +258,6 @@ public class redirect extends HttpServlet {
 					ps.setString(7, phone);
 					ps.setString(8, email);
 					ps.setString(9, user);
-					ps.setInt(10, age);
 
 					ps.executeUpdate();
 
@@ -285,12 +278,5 @@ public class redirect extends HttpServlet {
 			ex.printStackTrace();
 		}			
 		//doGet(request, response);
-	}
-	
-	public boolean checkAge(String age) {
-		for(int i = 0; i < age.length(); i++) {
-			if(Character.isLetter(age.charAt(i)) == true) return false;
-		}
-		return true;
 	}
 }
