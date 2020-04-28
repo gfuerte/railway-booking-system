@@ -12,6 +12,7 @@ import javax.servlet.http.*;
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -54,19 +55,17 @@ public class createReservations extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-
 		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
+        HttpSession session = request.getSession();  
+		String message = "";
+	    request.setAttribute("confirmation", message);
 		
 		try {
-			//Get the database connection
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			
 			Class.forName("com.mysql.jdbc.Driver");
-			
 			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
-			
 			Statement stmt = con.createStatement();
-			
+
 			String query = "SELECT * FROM RailwayBookingSystem.Schedule";
 				
 			if (request.getParameter("reset") != null) {
@@ -111,11 +110,11 @@ public class createReservations extends HttpServlet {
 		    }
 		    
 		    request.setAttribute("list", trains);
-		    
 		    if(request.getParameter("reserve") != null) {
 				String trainNumber = request.getParameter("trainNumber");
 				if(trainNumber != null && !trainNumber.isEmpty()) {
-					int rid = (int)(Math.random()*9999); //(if rid is already in database)
+					int rid = (int)(Math.random()*9999); 
+					while (checkRID(rid) == false) rid = (int)(Math.random()*9999);
 					double fare;
 					String username;
 					Timestamp date;
@@ -124,16 +123,15 @@ public class createReservations extends HttpServlet {
 					for(int i = 0; i < trains.size(); i++) {
 						if((trains.get(i).getTrainnum() == Integer.parseInt(trainNumber))) {	
 							fare = trains.get(i).getFare();
-							username = "";
+							username = (String)session.getAttribute("Name");
 							date = new Timestamp(System.currentTimeMillis());
 							train = trains.get(i).getTrainnum();
 							
-							System.out.println("found at " + i);
-							System.out.println(rid);
-							System.out.println(fare);
-							System.out.println(username);
-							System.out.println(date);
-							System.out.println(train);
+							System.out.println("rid is: " + rid);
+							System.out.println("fare is: " + fare);
+							System.out.println("username is: " + username);
+							System.out.println("date is: " + date);
+							System.out.println("train is: " + train);
 							
 							String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fare`,`username`, `date`, `train`) VALUES (?,?,?,?,?);";
 
@@ -144,12 +142,18 @@ public class createReservations extends HttpServlet {
 							statement.setTimestamp(4, date);
 							statement.setInt(5, train);
 
-							statement.executeUpdate();
+							//statement.executeUpdate();
+							
+							message = "Sucessfully Created Reservation";
+						    request.setAttribute("confirmation", message);
 							break;
 							
 						}
 					}
-				} 
+				} else {
+					message = "Please Select Train Number";
+				    request.setAttribute("confirmation", message);
+				}
 			}
 			
 			
@@ -161,5 +165,26 @@ public class createReservations extends HttpServlet {
 		dispatcher.forward(request, response);
 			
 		
+	}
+	
+	public boolean checkRID(int rid) {
+		try {
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+			Statement stmt = con.createStatement();
+			ResultSet query = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Reservations WHERE rid=" + rid + ";");
+			
+			int count = 0;
+			while(query.next()) count++;
+			if(count != 0) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 }
