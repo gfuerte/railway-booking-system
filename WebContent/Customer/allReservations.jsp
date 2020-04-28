@@ -36,7 +36,21 @@
              </tr>
         </c:forEach>
 	</table>
-	<br><br><br>
+	<br>
+	<form method="post" action="${pageContext.request.contextPath}/allReservations">
+		<p>
+		Select Reservation Number 
+		<select name="reservationNumber">
+			<option disabled selected value="0">-- Choose Number --</option>
+			<c:forEach var="x" items="${current}">
+				<option><c:out value="${x.rid}" /></option>
+			</c:forEach>
+		</select>
+		<input type="submit" name="cancel" value="Cancel Reservation">
+		<br><br>${confirmation}
+		</p>
+	</form>
+	<br><br><br><br>
 	<table border="1">
 		<h2 align="center">Past Reservations</h2>
     	<tr>

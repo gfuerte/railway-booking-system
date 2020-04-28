@@ -78,17 +78,6 @@ public class allReservations extends HttpServlet {
 					String created = format.format(query.getTimestamp("date"));
 					int trainNum = query.getInt("train");
 					
-					/* created is "2020-04-28"
-					int test = created.compareTo("2021-04-28"); if after returns -1
-					int test = created.compareTo("2020-04-28"); if current returns 0
-					int test = created.compareTo("2019-04-28"); if before returns 1 */
-					
-					System.out.println("rid is: " + rid);
-					System.out.println("fare is: " + fare);
-					System.out.println("created is: " + created);
-					System.out.println("trainNum is: " + trainNum);
-					System.out.println("current date is: " + currentDate);
-					
 					if(created.compareTo(currentDate) >= 0) {
 					//current
 						insertReservation(current, username, created, rid, trainNum, fare);
@@ -96,19 +85,26 @@ public class allReservations extends HttpServlet {
 					//past
 						insertReservation(past, username, created, rid, trainNum, fare);
 					}
-					
-					for(int i = 0; i < current.size(); i++) {
-						System.out.println("current: " + current.get(i).getRid());
-					}
-					for(int i = 0; i < past.size(); i++) {
-						System.out.println("past: " + past.get(i).getRid());
-					}
+
 					request.setAttribute("current", current);
 					request.setAttribute("past", past);
 				}
 			}
 			
-			
+			if(request.getParameter("cancel") != null) {
+				String rid = request.getParameter("reservationNumber");
+				if(rid != null && !rid.isEmpty()) {
+					String delete = "DELETE FROM Reservations WHERE rid=" + rid + ";";
+					PreparedStatement statement = con.prepareStatement(delete);
+					statement.executeUpdate();
+					
+					message = "Sucessfully Canceled Reservation";
+				    request.setAttribute("confirmation", message);
+				} else {
+					message = "Please Select Reservation Number";
+				    request.setAttribute("confirmation", message);
+				}
+			}
 			
 	    } catch (Exception ex) {
 			ex.printStackTrace();
