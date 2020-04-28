@@ -58,14 +58,7 @@ public class adminFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/adminAddEmployee.jsp");
 			dispatcher.forward(request, response);
 		}
-		else if(request.getParameter("ModifyCusInfo") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/editInfo.jsp");
-			dispatcher.forward(request, response);
-		}
-		else if(request.getParameter("ModifyEmpInfo") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/editInfo.jsp");
-			dispatcher.forward(request, response);
-		}
+		
 		else if(request.getParameter("getMonthlySales") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/monthlySale.jsp");
 			dispatcher.forward(request, response);
@@ -139,7 +132,7 @@ public class adminFunctions extends HttpServlet{
 					
 					ps.executeUpdate();
 					
-					//insert into rep
+					//insert into cus
 					search = "INSERT INTO RailwayBookingSystem.Customer(LName, FName, Address, City, State, Zcode, Phone, Email, username) VALUES (?,?,?,?,?,?,?,?,?)" ;
 					ps = con.prepareStatement(search);
 					ps.setString(1, lname);
@@ -166,7 +159,7 @@ public class adminFunctions extends HttpServlet{
 			}
 			
 			
-			else if(request.getParameter("addEmployee") != null) {
+			if(request.getParameter("addEmployee") != null) {
 
 				//Create a SQL statement
 				Statement stmt = con.createStatement();
@@ -232,6 +225,209 @@ public class adminFunctions extends HttpServlet{
 	            	dispatcher.forward(request, response);
 				}
 			}
+			if(request.getParameter("ModifyCus") != null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyCus.jsp");
+				dispatcher.forward(request, response);
+			}
+			if(request.getParameter("ModifyRep") != null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+				dispatcher.forward(request, response);
+			}
+			
+			if(request.getParameter("DeleteUser") != null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+				dispatcher.forward(request, response);
+			}
+			if(request.getParameter("saveChangesCus") != null) {
+				String modification = request.getParameter("modification");
+				
+				String user = request.getParameter("username");
+				String pswd = request.getParameter("pswd");
+				String fname = request.getParameter("fname");
+				String lname = request.getParameter("lname");
+				String address = request.getParameter("address");
+				String city = request.getParameter("city");
+				String state = request.getParameter("state");
+				String zcode = request.getParameter("zcode");
+				String phone = request.getParameter("phone");
+				String email = request.getParameter("email");
+				
+				if(modification.isEmpty()) {
+					String message = "Please fill out Customer Username";
+				    request.setAttribute("message", message);
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyCus.jsp");
+		            dispatcher.forward(request, response);
+		            return;
+				}
+				
+				if(user.isEmpty() && pswd.isEmpty() && fname.isEmpty() && lname.isEmpty() && address.isEmpty() && city.isEmpty() && state.isEmpty() && zcode.isEmpty() && phone.isEmpty() && email.isEmpty()) {
+					String message = "Please fill out at least one field to update.";
+				    request.setAttribute("message", message);
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyCus.jsp");
+		            dispatcher.forward(request, response);
+		            return;
+				}
+				
+				if(!modification.isEmpty()) {
+					//Make a SELECT query from the table to see if user exists
+					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, modification);
+					
+					
+					result = ps.executeQuery();
+
+					
+					HttpSession session=request.getSession(); 
+					//check if empty result set
+					if (!result.isBeforeFirst() ) { 
+						String message = "Customer does not exist in the system.";
+					    request.setAttribute("message", message);
+					    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyCus.jsp");
+			            dispatcher.forward(request, response);
+			            return;
+					}
+				}
+				if(!user.isEmpty()){
+					
+					//Make a SELECT query from the table to see if user exists
+					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, user);
+					
+					
+					result = ps.executeQuery();
+
+					
+					HttpSession session=request.getSession(); 
+					//check if empty result set
+					if (!result.isBeforeFirst() ) { 
+						search = "UPDATE RailwayBookingSystem.Login SET username = ? WHERE username = ?" ;
+						
+						//Create Prepared Statement
+						ps = con.prepareStatement(search);
+						ps.setString(1, user); ps.setString(2, modification);
+						
+						ps.executeUpdate();
+						modification= user;
+					}
+					else{
+						String message = "Invalid Update. Username taken. Please try another unique username";
+					    request.setAttribute("message", message);
+						RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyCus.jsp");
+		            	dispatcher.forward(request, response);
+		            	return;
+					}
+				}
+				if(!pswd.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Login SET password = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, pswd); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+				}
+				if(!fname.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET FName = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, fname); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!lname.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET LName = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, lname); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!address.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET Address = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, address); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!city.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET City = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, city); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!state.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET State = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, state); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!zcode.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET Zcode = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, zcode); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!phone.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET Phone = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, phone); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!email.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Customer SET Email = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, email); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				
+				String message = "Customer update successfully complete.";
+			    request.setAttribute("message", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyCus.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			
 			
 		}catch (Exception ex) {
 			ex.printStackTrace();
