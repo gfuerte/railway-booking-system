@@ -82,13 +82,46 @@ public class search extends HttpServlet {
 				String selectedtrainnum = request.getParameter("trainNumber");
 				query += " WHERE train = " + selectedtrainnum;
 			} else if (request.getParameter("searchconditions") != null) {
-				
 				if (!date.isEmpty() || !sorigin.isEmpty() || !sdestination.isEmpty()) {
 					query += " WHERE";
-				}
 				
+					if (!date.isEmpty()) {
+						query += " departureDatetime like \"" + date + "%\""; 
+						request.setAttribute("da", date);
+					}
+					
+					if (!sorigin.isEmpty()) {
+						if (!date.isEmpty()) {
+							query += " AND origin = \"" + sorigin  + "\"";
+						} else {
+							query += " origin = \"" + sorigin + "\"";
+						}
+						request.setAttribute("o", sorigin);
+					}
+					
+					if (!sdestination.isEmpty()) {
+						if (!date.isEmpty() || !sorigin.isEmpty()) {
+							query += " AND destination = \"" + sdestination + "\"";
+						} else {
+							query += " destination = \"" + sdestination + "\"";						
+						}
+						request.setAttribute("de", sdestination);
+					}
+				
+				}
+			}
+			
+			
+			date =  (String) request.getAttribute("date");
+			sorigin = (String) request.getAttribute("origin");
+			sdestination = (String) request.getAttribute("destination");
+			
+			if (!date.isEmpty() || !sorigin.isEmpty() || !sdestination.isEmpty()) {
+				query += " WHERE";
+			
 				if (!date.isEmpty()) {
 					query += " departureDatetime like \"" + date + "%\""; 
+					request.setAttribute("da", date);
 				}
 				
 				if (!sorigin.isEmpty()) {
@@ -97,6 +130,7 @@ public class search extends HttpServlet {
 					} else {
 						query += " origin = \"" + sorigin + "\"";
 					}
+					request.setAttribute("o", sorigin);
 				}
 				
 				if (!sdestination.isEmpty()) {
@@ -105,38 +139,35 @@ public class search extends HttpServlet {
 					} else {
 						query += " destination = \"" + sdestination + "\"";						
 					}
+					request.setAttribute("de", sdestination);
 				}
-				
-				request.setAttribute("da", date);
-				request.setAttribute("o", sorigin);
-				request.setAttribute("de", sdestination);
-			} 
 			
+			}
 			
 			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY departureDatetime");
+				query += " ORDER BY departureDatetime";
 				
 			} else if (request.getParameter("sortarrival") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY arrivalDatetime");
+				query += " ORDER BY arrivalDatetime";
 				
 			} else if (request.getParameter("sortorigin") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY origin");
+				query += " ORDER BY origin";
 				
 			} else if (request.getParameter("sortdestination") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY destination");
+				query += " ORDER BY destination";
 				
 			} else if (request.getParameter("sortfare") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY fare");
+				query += " ORDER BY fare";
 				
-			} else {
-				
-				all = stmt.executeQuery(query);
 			}
+			
+				
+			all = stmt.executeQuery(query);
 			
 			ArrayList<TrainSchedule> trains = new ArrayList<TrainSchedule>();
 			
@@ -162,9 +193,13 @@ public class search extends HttpServlet {
 	    	request.setAttribute("list", trains);
 	    	request.setAttribute("slist", nums);	
 			
+	    	System.out.println(query);
+	    	
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		
+		
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/schedule.jsp");
 		dispatcher.forward(request, response);
