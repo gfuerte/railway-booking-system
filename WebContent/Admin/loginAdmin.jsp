@@ -28,13 +28,9 @@ Modify/Delete User:
 <br>
 
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
-<table>
-<tr>    
-<td>Enter User's Username:</td><td><input type="text" name="modifyusername"></td>
-</tr>
-</table>
-<input type ="submit" name = "ModifyCusInfo" value = "Modify Customer Information">
-<input type ="submit" name = "ModifyEmpInfo" value = "Modify Employee Information">
+<input type ="submit" name = "ModifyCus" value = "Modify Customer">
+<input type ="submit" name = "ModifyRep" value = "Modify Customer Representative">
+<input type ="submit" name = "DeleteUser" value = "Delete User">
 </form>
 <br><br>
 
