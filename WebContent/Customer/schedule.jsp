@@ -25,8 +25,27 @@
 	</table>
 	<input type="submit" name = "searchconditions" value="Search">
 	</form>
-<br><br>
-Sort by:
+
+<br>
+Or
+<br>
+	<form method="post" action="${pageContext.request.contextPath}/search">
+	
+		<p>
+		View stops for train number: 
+		<select name="trainNumber">
+			<option disabled selected value="0">-- Choose Number --</option>
+			<c:forEach var="x" items="${list}">
+				<option><c:out value="${x.trainnum}" /></option>
+			</c:forEach>
+		</select>
+		<input type="submit" name="showStops" value="See Stops">
+		<br>
+		<input type="submit" name="showTrains" value="See All Trains">
+		<br><br>
+		</p>
+	</form>	
+Sort ALL trains by:
 <br><br>
 	<form method="post" action="${pageContext.request.contextPath}/search">
 	<table>
