@@ -72,7 +72,7 @@ public class allReservations extends HttpServlet {
 			ArrayList<Reservation> past = new ArrayList<>();
 			
 			while(query.next()) {
-				if(query.getString("username").equals(username)) {
+				if(query.getString("customerUsername").equals(username)) {
 					int rid = query.getInt("rid");
 					double fare = query.getDouble("fare");
 					String created = format.format(query.getTimestamp("date"));
