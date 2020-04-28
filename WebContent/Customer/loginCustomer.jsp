@@ -12,28 +12,30 @@ form {
 </style>
 </head>
 <body>
-Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
-<br>
-<form action = "${pageContext.request.contextPath}/QA" method = "post">
-<input type ="submit" name = "QA" value = "Questions">
-</form>
-<form action = "${pageContext.request.contextPath}/QA" method = "post">
-<input type ="submit" name = "Alerts" value = "Alerts">
-</form>
-<br><br>
-<form action = "${pageContext.request.contextPath}/search" method = "post">
-<input type ="submit" name = "Schedules" value = "See Schedules">
-</form>
-<br><br>
-<form action = "${pageContext.request.contextPath}/createReservations" method = "post">
-<input type ="submit" name = "Reservations" value = "Create Reservations">
-</form>
-<form>
-<input type="submit" value="Current/Past Reservations">
-</form>
-<br><br>
-<form method="get" action="${pageContext.request.contextPath}/redirect">
-<input type="submit" name = "logoutButton" value="logout">
-</form>
+<div align="center">
+	Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
+	<br><br>
+	<form action = "${pageContext.request.contextPath}/QA" method = "post">
+	<input type ="submit" name = "QA" value = "Questions">
+	</form>
+	<form action = "${pageContext.request.contextPath}/QA" method = "post">
+	<input type ="submit" name = "Alerts" value = "Alerts">
+	</form>
+	<br><br>
+	<form action = "${pageContext.request.contextPath}/search" method = "post">
+	<input type ="submit" name = "Schedules" value = "See Schedules">
+	</form>
+	<br><br>
+	<form action = "${pageContext.request.contextPath}/allReservations" method = "post">
+	<input type="submit" value="Current/Past Reservations">
+	</form>
+	<form action = "${pageContext.request.contextPath}/createReservations" method = "post">
+	<input type ="submit" name = "Reservations" value = "Create Reservations">
+	</form>
+	<br><br>
+	<form method="get" action="${pageContext.request.contextPath}/redirect">
+	<input type="submit" name = "logoutButton" value="logout">
+	</form>
+</div>
 </body>
 </html>

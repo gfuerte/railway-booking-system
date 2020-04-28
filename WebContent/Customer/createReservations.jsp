@@ -54,6 +54,7 @@
 			</c:forEach>
 		</select>
 		<input type="submit" name="reserve" value="Create Reservation">
+		<br><br>${confirmation}
 		</p>
 	</form>
 	
