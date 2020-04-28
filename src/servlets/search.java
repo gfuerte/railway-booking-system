@@ -70,7 +70,13 @@ public class search extends HttpServlet {
 			
 			String query = "SELECT * FROM RailwayBookingSystem.Schedule";
 			
-			if (request.getParameter("searchconditions") != null) {
+			if(request.getParameter("showAllStops") != null) {
+				all = stmt.executeQuery(query);
+			}
+			else if(request.getParameter("showStops") != null) {
+				String selectedtrainnum = request.getParameter("trainNumber");
+				query += " WHERE train = " + selectedtrainnum;
+			} else if (request.getParameter("searchconditions") != null) {
 				String date = request.getParameter("date");
 				String origin = request.getParameter("origin");
 				String destination = request.getParameter("destination");
@@ -102,13 +108,13 @@ public class search extends HttpServlet {
 				}
 			} 
 			
-			if (request.getParameter("sortarrival") != null) {
-				
-				all = stmt.executeQuery(query + " ORDER BY arrivalDatetime");
-				
-			} else if (request.getParameter("sortdeparture") != null) {
+			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
 
 				all = stmt.executeQuery(query + " ORDER BY departureDatetime");
+				
+			} else if (request.getParameter("sortarrival") != null) {
+				
+				all = stmt.executeQuery(query + " ORDER BY arrivalDatetime");
 				
 			} else if (request.getParameter("sortorigin") != null) {
 				
@@ -126,8 +132,8 @@ public class search extends HttpServlet {
 				
 				all = stmt.executeQuery(query);
 			}
-				
-			ArrayList<TrainSchedule> trains = new ArrayList<>();
+			
+			ArrayList<TrainSchedule> trains = new ArrayList<TrainSchedule>();
 		    
 		    while(all.next()) {
 		    	int trainnum = all.getInt("train");
@@ -148,8 +154,9 @@ public class search extends HttpServlet {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/schedule.jsp");
-			dispatcher.forward(request, response);
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/schedule.jsp");
+		dispatcher.forward(request, response);
 			
 		
 	}

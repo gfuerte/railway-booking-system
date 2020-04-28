@@ -228,8 +228,7 @@ public class redirect extends HttpServlet {
 				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Login/customerSignUp.jsp");
 		            dispatcher.forward(request, response);
 		            return;
-				}
-				else {
+				} else {
 					result = ps.executeQuery();
 				}
 				
@@ -280,5 +279,4 @@ public class redirect extends HttpServlet {
 		}			
 		//doGet(request, response);
 	}
-
 }
