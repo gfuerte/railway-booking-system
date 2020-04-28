@@ -127,7 +127,7 @@ public class createReservations extends HttpServlet {
 							date = new Timestamp(System.currentTimeMillis());
 							train = trains.get(i).getTrainnum();
 							
-							String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fare`,`username`, `date`, `train`) VALUES (?,?,?,?,?);";
+							String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fare`,`customerUsername`, `date`, `train`) VALUES (?,?,?,?,?);";
 
 							PreparedStatement statement = con.prepareStatement(insert);
 							statement.setInt(1, rid);
