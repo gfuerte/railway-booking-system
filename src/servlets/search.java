@@ -184,7 +184,7 @@ public class search extends HttpServlet {
 	    	request.setAttribute("list", trains);
 	    	request.setAttribute("slist", nums);	
 			
-	    	System.out.println(query);
+//	    	System.out.println(query);
 	    	
 		} catch (Exception ex) {
 			ex.printStackTrace();
