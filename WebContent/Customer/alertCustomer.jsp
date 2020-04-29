@@ -5,20 +5,22 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Questions</title>
+<title>Alerts</title>
 </head>
 <body>
 <div align="center">
         <table border="1" cellpadding="5">
             <caption><h2>Alerts</h2></caption>
             <tr>
-                <th>Alert</th>
+                <th>Route</th>
                 <th>Date</th>
+                <th>Alert</th>
             </tr>
             <c:forEach var="a" items="${list}">
                 <tr>
-                    <td><c:out value="${a.alert}" /></td>
-                    <td><c:out value="${a.date}" /></td>
+                    <td><c:out value="${a.question}" /></td>
+                    <td><c:out value="${a.qauthor}" /></td>
+                    <td><c:out value="${a.answer}" /></td>
                 </tr>
             </c:forEach>
         </table>

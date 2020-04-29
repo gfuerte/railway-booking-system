@@ -6,7 +6,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.RequestDispatcher;
@@ -15,9 +18,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import POJOs.Alert;
 import POJOs.QAPair;
 
 /**
@@ -67,25 +67,65 @@ public class QA extends HttpServlet {
 
 		if(request.getParameter("Alerts") != null) {
 			
-			//get list of Alerts that is found by searching reservations for customer username and finding route and then checking 
-			//if alerts table has route in it along with the date information
 			
-			Alert a = new Alert("Delay Route #570", "1/2/2020");
-			Alert b = new Alert("Delay Route #571", "1/3/2020");
-			ArrayList<Alert> as = new ArrayList<>();
-			as.add(a);
-			as.add(b);
 			
-			request.setAttribute("list", as);
+			//QAPair a = new QAPair("NE Corridor", "Delay Route #570","1/2/2020", "None", "None");
+			//QAPair b = new QAPair("NE2 Corridor", "Delay Route #571","1/2/2020", "None", "None");
+			//as.add(a);
+			//as.add(b);
+			try {
+
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+				Class.forName("com.mysql.jdbc.Driver");
+
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+
+				//Get HTML Params
+				String user = (String) request.getSession(false).getAttribute("Name");
+
+				//Make a SELECT query from the table to see if user exists
+				String search = "SELECT DISTINCT a.message, a.date, a.TransitLine FROM Alert a, Reservations r WHERE r.TransitLine = a.TransitLine AND r.customerUsername = ? AND r.date LIKE CONCAT(a.date, \"%\")";
+
+				//Create Prepared Statement
+				String srch = request.getParameter("Search");
+				PreparedStatement ps = con.prepareStatement(search);
+
+
+				ps.setString(1, user);
+				ResultSet rs = ps.executeQuery();
+
+
+				ArrayList<QAPair> as = new ArrayList<>();
+				
+				while (rs.next()) 
+				{  
+					String msg = rs.getString("message");  
+					String date = rs.getString("date");
+					String tLine = rs.getString("TransitLine");
+					QAPair a = new QAPair(tLine, msg, date, "None", "None");
+					as.add(a);
+				} 
+
+				request.setAttribute("list", as);
+				//RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/alertCustomer.jsp");
+				//dispatcher.forward(request, response);
+
+			}catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/alertCustomer.jsp");
 			dispatcher.forward(request, response);
 		}
-		else if(request.getParameter("AlertsR") != null) {
+		/*else if(request.getParameter("AlertsR") != null) {
 			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/alertRep.jsp");
 			dispatcher.forward(request, response);
 			
-		}
+		}*/
 		
 		else if(request.getParameter("searchButton") != null) {
 			try {
@@ -379,7 +419,130 @@ public class QA extends HttpServlet {
 				ex.printStackTrace();
 			}
 		}
+		else if(request.getParameter("AlertsR") != null) {
+			
+			try {
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+				
+				Class.forName("com.mysql.jdbc.Driver");
+				
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				
+				Statement stmt = con.createStatement();
+				ResultSet rs;
+				
+				String query = "SELECT TransitLine FROM RailwayBookingSystem.Route";
+				
+				rs = stmt.executeQuery(query);
+			    
+				ArrayList<QAPair> listQs = new ArrayList<>();
 
+				while (rs.next()) 
+				{  
+					String Text = rs.getString("TransitLine");
+					String UUID = rs.getString("TransitLine");
+
+					QAPair q = new QAPair(Text, "None", "None", "None", UUID);
+					listQs.add(q);
+					
+					//System.out.println(Text);
+				} 
+				
+			    request.setAttribute("list", listQs);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/alertRep.jsp");
+			dispatcher.forward(request, response);	
+			
+		}
+		else if(request.getParameter("submitAlertR") != null) {
+			String ans = request.getParameter("Alert");
+			String rad = request.getParameter("tLine");
+			String date = request.getParameter("date");
+
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.setLenient(false);
+
+			try {
+				Date d = sdf.parse(date);
+			} catch (ParseException e) {
+				e.printStackTrace();
+				date = "";			
+			}
+
+			if(rad == null || ans.isEmpty() || date.isEmpty()) {
+				request.setAttribute("message", "Please enter a valid date format, select a transit line, and type an alert message in the box!");
+			}
+			else {
+				try {
+					//Get the database connection
+					String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+					Class.forName("com.mysql.jdbc.Driver");
+
+					Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+					//Make a SELECT query from the table to see if user exists
+					String updt = "INSERT INTO RailwayBookingSystem.Alert(`UUID`,`TransitLine`,`date`, `owner`, `message`) VALUES (?,?,?,?,?)";
+
+					//Create Prepared Statement
+					PreparedStatement psU = con.prepareStatement(updt);
+					psU.setString(1, UUID.randomUUID().toString().replace("-", ""));
+					psU.setString(2, rad);
+					psU.setString(3, date);
+					psU.setString(4, (String)request.getSession(false).getAttribute("Name"));
+					psU.setString(5, ans);
+					System.out.println(rad + " " + date + " " + ans);
+					psU.executeUpdate();
+					request.setAttribute("message", "Alert sent to applicable customers!");
+				}catch (Exception ex) {
+					request.setAttribute("message", "error");
+					ex.printStackTrace();
+				}
+				
+			}
+			
+			
+			try {
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+				
+				Class.forName("com.mysql.jdbc.Driver");
+				
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				
+				Statement stmt = con.createStatement();
+				ResultSet rs;
+				
+				String query = "SELECT TransitLine FROM RailwayBookingSystem.Route";
+				
+				rs = stmt.executeQuery(query);
+			    
+				ArrayList<QAPair> listQs = new ArrayList<>();
+
+				while (rs.next()) 
+				{  
+					String Text = rs.getString("TransitLine");
+					String UUID = rs.getString("TransitLine");
+
+					QAPair q = new QAPair(Text, "None", "None", "None", UUID);
+					listQs.add(q);
+					
+					//System.out.println(Text);
+				} 
+				
+			    request.setAttribute("list", listQs);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/alertRep.jsp");
+			dispatcher.forward(request, response);	
+		}
 		else {
 			try {
 

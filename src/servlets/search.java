@@ -14,11 +14,7 @@ import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import POJOs.Alert;
 import POJOs.TrainSchedule;
 
 /**
@@ -56,6 +52,7 @@ public class search extends HttpServlet {
 		// TODO Auto-generated method stub
 
 		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
+		HttpSession session=request.getSession(); 
 		
 		try {
 			//Get the database connection
@@ -65,78 +62,110 @@ public class search extends HttpServlet {
 			
 			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
 			
+			String date = request.getParameter("date");
+			String sorigin = request.getParameter("origin");
+			String sdestination = request.getParameter("destination");
+			
 			Statement stmt = con.createStatement();
 			ResultSet all;
 			
 			String query = "SELECT * FROM RailwayBookingSystem.Schedule";
 			
-			if(request.getParameter("showAllStops") != null) {
+			if(request.getParameter("showTrains") != null) {
+				session.setAttribute("da", null);
+				session.setAttribute("o", null);
+				session.setAttribute("de", null);
 				all = stmt.executeQuery(query);
 			}
 			else if(request.getParameter("showStops") != null) {
 				String selectedtrainnum = request.getParameter("trainNumber");
 				query += " WHERE train = " + selectedtrainnum;
 			} else if (request.getParameter("searchconditions") != null) {
-				String date = request.getParameter("date");
-				String origin = request.getParameter("origin");
-				String destination = request.getParameter("destination");
-				
-				query = "SELECT * FROM RailwayBookingSystem.Schedule";
-				
-				if (!date.isEmpty() || !origin.isEmpty() || !destination.isEmpty()) {
+				if (!date.isEmpty() || !sorigin.isEmpty() || !sdestination.isEmpty()) {
 					query += " WHERE";
-				}
 				
-				if (!date.isEmpty()) {
-					query += " departureDatetime like \"" + date + "%\""; 
-				}
-				
-				if (!origin.isEmpty()) {
 					if (!date.isEmpty()) {
-						query += " AND origin = \"" + origin  + "\"";
+						query += " departureDatetime like \"" + date + "%\""; 
+						session.setAttribute("da", date);
+					}
+					
+					if (!sorigin.isEmpty()) {
+						if (!date.isEmpty()) {
+							query += " AND origin = \"" + sorigin  + "\"";
+						} else {
+							query += " origin = \"" + sorigin + "\"";
+						}
+						session.setAttribute("o", sorigin);
+					}
+					
+					if (!sdestination.isEmpty()) {
+						if (!date.isEmpty() || !sorigin.isEmpty()) {
+							query += " AND destination = \"" + sdestination + "\"";
+						} else {
+							query += " destination = \"" + sdestination + "\"";						
+						}
+						session.setAttribute("de", sdestination);
+					}
+				
+				}
+
+			} else if (session.getAttribute("da") != null || session.getAttribute("o") != null || session.getAttribute("de") != null) {
+				query += " WHERE";
+			
+				if (session.getAttribute("da") != null) {
+					query += " departureDatetime like \"" + session.getAttribute("da") + "%\""; 
+				}
+				
+				if (session.getAttribute("o") != null) {
+					if (session.getAttribute("da") != null) {
+						query += " AND origin = \"" + session.getAttribute("o")  + "\"";
 					} else {
-						query += " origin = \"" + origin + "\"";
+						query += " origin = \"" + session.getAttribute("o") + "\"";
 					}
 				}
 				
-				if (!destination.isEmpty()) {
-					if (!date.isEmpty() || !origin.isEmpty()) {
-						query += " AND destination = \"" + destination + "\"";
+				if (session.getAttribute("de") != null) {
+					if (session.getAttribute("da") != null || session.getAttribute("o") != null) {
+						query += " AND destination = \"" + session.getAttribute("de") + "\"";
 					} else {
-						query += " destination = \"" + destination + "\"";						
+						query += " destination = \"" + session.getAttribute("de") + "\"";						
 					}
 				}
-			} 
+			
+			}
+				
+			
 			
 			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
-
-				all = stmt.executeQuery(query + " ORDER BY departureDatetime");
+				
+				query += " ORDER BY departureDatetime";
 				
 			} else if (request.getParameter("sortarrival") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY arrivalDatetime");
+				query += " ORDER BY arrivalDatetime";
 				
 			} else if (request.getParameter("sortorigin") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY origin");
+				query += " ORDER BY origin";
 				
 			} else if (request.getParameter("sortdestination") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY destination");
+				query += " ORDER BY destination";
 				
 			} else if (request.getParameter("sortfare") != null) {
 				
-				all = stmt.executeQuery(query + " ORDER BY fare");
+				query += " ORDER BY fare";
 				
-			} else {
-				
-				all = stmt.executeQuery(query);
 			}
+
+			all = stmt.executeQuery(query);
 			
 			ArrayList<TrainSchedule> trains = new ArrayList<TrainSchedule>();
+			
+			ArrayList<Integer> nums = new ArrayList<Integer>();
 		    
 		    while(all.next()) {
-		    	int trainnum = all.getInt("train");
+		    	Integer trainnum = all.getInt("train");
 		    	String origin = all.getString("origin");
 		    	String destination = all.getString("destination");
 		    	String arrival = ft.format(all.getTimestamp("arrivalDatetime"));
@@ -146,17 +175,26 @@ public class search extends HttpServlet {
 		    	
 		    	trains.add(new TrainSchedule(trainnum, origin, destination, arrival, departure, fare, transitline));
 		    	
+		    	if(!nums.contains(trainnum)) {
+		    		nums.add(trainnum);
+		    	}
+		    	
 		    }
 		    
-		    request.setAttribute("list", trains);
+	    	request.setAttribute("list", trains);
+	    	request.setAttribute("slist", nums);	
 			
-			
+//	    	System.out.println(query);
+	    	
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		
+		
+		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/schedule.jsp");
 		dispatcher.forward(request, response);
+		
 			
 		
 	}
