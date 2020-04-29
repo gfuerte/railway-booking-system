@@ -47,13 +47,22 @@ Generate Monthly Sales Report:
 </form>
 <br><br>
 
-<body>
-List Reservations By:
-<select id="optionsRevenue">
-  <option value="tltn">Transit Line and Train Number</option>
-  <option value="cn">Customer Name</option>
-</select>
+
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
+List Reservations By:
+<table>
+<tr>    
+<td>Transit Line:</td><td><input type="text" name="transitLine"></td>
+<td>  AND  Train Number:</td><td><input type="text" name="trainNum"></td>
+</tr>
+</table>
+	OR
+<br>
+<table>
+<tr>    
+<td>Customer Name:</td><td><input type="text" name="cname"></td>
+</tr>
+</table>
 <input type ="submit" name = "getReservations" value = "Go">
 </form>
 <br><br>
