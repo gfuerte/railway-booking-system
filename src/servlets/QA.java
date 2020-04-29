@@ -67,16 +67,56 @@ public class QA extends HttpServlet {
 
 		if(request.getParameter("Alerts") != null) {
 			
-			//get list of Alerts that is found by searching reservations for customer username and finding route and then checking 
-			//if alerts table has route in it along with the date information
 			
-			QAPair a = new QAPair("NE Corridor", "Delay Route #570","1/2/2020", "None", "None");
-			QAPair b = new QAPair("NE2 Corridor", "Delay Route #571","1/2/2020", "None", "None");
-			ArrayList<QAPair> as = new ArrayList<>();
-			as.add(a);
-			as.add(b);
 			
-			request.setAttribute("list", as);
+			//QAPair a = new QAPair("NE Corridor", "Delay Route #570","1/2/2020", "None", "None");
+			//QAPair b = new QAPair("NE2 Corridor", "Delay Route #571","1/2/2020", "None", "None");
+			//as.add(a);
+			//as.add(b);
+			try {
+
+				//Get the database connection
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+
+				Class.forName("com.mysql.jdbc.Driver");
+
+				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+
+
+				//Get HTML Params
+				String user = (String) request.getSession(false).getAttribute("Name");
+
+				//Make a SELECT query from the table to see if user exists
+				String search = "SELECT DISTINCT a.message, a.date, a.TransitLine FROM Alert a, Reservations r WHERE r.TransitLine = a.TransitLine AND r.customerUsername = ? AND r.date LIKE CONCAT(a.date, \"%\")";
+
+				//Create Prepared Statement
+				String srch = request.getParameter("Search");
+				PreparedStatement ps = con.prepareStatement(search);
+
+
+				ps.setString(1, user);
+				ResultSet rs = ps.executeQuery();
+
+
+				ArrayList<QAPair> as = new ArrayList<>();
+				
+				while (rs.next()) 
+				{  
+					String msg = rs.getString("message");  
+					String date = rs.getString("date");
+					String tLine = rs.getString("TransitLine");
+					QAPair a = new QAPair(tLine, msg, date, "None", "None");
+					as.add(a);
+				} 
+
+				request.setAttribute("list", as);
+				//RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/alertCustomer.jsp");
+				//dispatcher.forward(request, response);
+
+			}catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/alertCustomer.jsp");
 			dispatcher.forward(request, response);
 		}
