@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import POJOs.TrainSchedule;
+import POJOs.Stop;
 
 /**
  * Servlet implementation class search
@@ -44,7 +45,7 @@ public class createReservations extends HttpServlet {
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		if(request.getParameter("goBack") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservationOptions.jsp");
 			dispatcher.forward(request, response);
 		}
 	}
@@ -54,10 +55,16 @@ public class createReservations extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		System.out.println("HERE");
 		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
         HttpSession session = request.getSession();  
 		String message = "";
 	    request.setAttribute("confirmation", message);
+	    
+	    ArrayList<Stop> possibleLines = (ArrayList<Stop>) session.getAttribute("possibleLines");
+	    for(int i = 0; i < possibleLines.size(); i++) {
+	    	System.out.println("From CR: " + possibleLines.get(i).line);
+	    }
 		
 		try {
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";

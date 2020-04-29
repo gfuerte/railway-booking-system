@@ -29,8 +29,8 @@ form {
 	<form action = "${pageContext.request.contextPath}/allReservations" method = "post">
 	<input type="submit" value="Current/Past Reservations">
 	</form>
-	<form action = "${pageContext.request.contextPath}/createReservations" method = "post">
-	<input type ="submit" name = "Reservations" value = "Create Reservations">
+	<form action = "${pageContext.request.contextPath}/reservationOptions" method = "post">
+	<input type ="submit" name = "Reservations Options" value = "Create Reservations">
 	</form>
 	<br><br>
 	<form method="get" action="${pageContext.request.contextPath}/redirect">
