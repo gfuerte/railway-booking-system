@@ -15,7 +15,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
-import POJOs.Alert;
 import POJOs.TrainSchedule;
 
 /**
