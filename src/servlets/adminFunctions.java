@@ -235,7 +235,7 @@ public class adminFunctions extends HttpServlet{
 			}
 			
 			if(request.getParameter("DeleteUser") != null) {
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/deleteUser.jsp");
 				dispatcher.forward(request, response);
 			}
 			if(request.getParameter("saveChangesCus") != null) {
@@ -270,7 +270,7 @@ public class adminFunctions extends HttpServlet{
 				
 				if(!modification.isEmpty()) {
 					//Make a SELECT query from the table to see if user exists
-					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE username = ?" ;
+					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE (username = ? AND level = \"C\")"  ;
 					
 					//Create Prepared Statement
 					PreparedStatement ps = con.prepareStatement(search);
@@ -428,6 +428,193 @@ public class adminFunctions extends HttpServlet{
 	            return;
 			}
 			
+			
+			
+			if(request.getParameter("saveChangesRep") != null) {
+				String modification = request.getParameter("modification");
+				
+				String user = request.getParameter("username");
+				String pswd = request.getParameter("pswd");
+				String fname = request.getParameter("fname");
+				String lname = request.getParameter("lname");
+				String ssn = request.getParameter("ssn");
+				
+				if(modification.isEmpty()) {
+					String message = "Please fill out Customer Representative Username";
+				    request.setAttribute("message", message);
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+		            dispatcher.forward(request, response);
+		            return;
+				}
+				
+				if(user.isEmpty() && pswd.isEmpty() && fname.isEmpty() && lname.isEmpty() && ssn.isEmpty()) {
+					String message = "Please fill out at least one field to update.";
+				    request.setAttribute("message", message);
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+		            dispatcher.forward(request, response);
+		            return;
+				}
+				
+				if(!modification.isEmpty()) {
+					//Make a SELECT query from the table to see if user exists
+					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE (username = ? AND level = \"R\")" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, modification);
+					
+					
+					result = ps.executeQuery();
+
+					
+					HttpSession session=request.getSession(); 
+					//check if empty result set
+					if (!result.isBeforeFirst() ) { 
+						String message = "Customer representative does not exist in the system.";
+					    request.setAttribute("message", message);
+					    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+			            dispatcher.forward(request, response);
+			            return;
+					}
+				}
+				if(!user.isEmpty()){
+					
+					//Make a SELECT query from the table to see if user exists
+					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, user);
+					
+					
+					result = ps.executeQuery();
+
+					
+					HttpSession session=request.getSession(); 
+					//check if empty result set
+					if (!result.isBeforeFirst() ) { 
+						search = "UPDATE RailwayBookingSystem.Login SET username = ? WHERE username = ?" ;
+						
+						//Create Prepared Statement
+						ps = con.prepareStatement(search);
+						ps.setString(1, user); ps.setString(2, modification);
+						
+						ps.executeUpdate();
+						modification= user;
+					}
+					else{
+						String message = "Invalid Update. Username taken. Please try another unique username";
+					    request.setAttribute("message", message);
+						RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+		            	dispatcher.forward(request, response);
+		            	return;
+					}
+				}
+				if(!pswd.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Login SET password = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, pswd); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+				}
+				if(!fname.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Representative SET FName = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, fname); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!lname.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Representative SET LName = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, lname); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				if(!ssn.isEmpty()){
+					String search = "UPDATE RailwayBookingSystem.Representative SET SSN = ? WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, ssn); ps.setString(2, modification);
+					
+					ps.executeUpdate();
+					
+					
+				}
+				
+				String message = "Customer representative update successfully complete.";
+			    request.setAttribute("message", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/modifyRep.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			if(request.getParameter("delete") != null) {
+				String deleteThisUser = request.getParameter("deleteThisUser");
+				
+				if(deleteThisUser.isEmpty()) {
+					String message = "Please enter a username.";
+				    request.setAttribute("message", message);
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/deleteUser.jsp");
+		            dispatcher.forward(request, response);
+		            return;
+				}
+				else if(deleteThisUser.contentEquals("admin")){
+					String message = "Permission Denied. You cannot delete admin.";
+				    request.setAttribute("message", message);
+				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/deleteUser.jsp");
+		            dispatcher.forward(request, response);
+		            return;
+				}
+				
+				else{
+					//Make a SELECT query from the table to see if user exists
+					String search = "SELECT * FROM RailwayBookingSystem.Login WHERE username = ?" ;
+					
+					//Create Prepared Statement
+					PreparedStatement ps = con.prepareStatement(search);
+					ps.setString(1, deleteThisUser);
+					
+					
+					result = ps.executeQuery();
+
+					
+					HttpSession session=request.getSession(); 
+					//check if empty result set
+					if (!result.isBeforeFirst() ) { 
+						String message = "User does not exist in the system.";
+					    request.setAttribute("message", message);
+					    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/deleteUser.jsp");
+			            dispatcher.forward(request, response);
+			            return;
+					}
+					else {
+						search = "DELETE FROM RailwayBookingSystem.Login WHERE username = ?" ;
+						
+						//Create Prepared Statement
+						ps = con.prepareStatement(search);
+						ps.setString(1, deleteThisUser);
+						
+						ps.executeUpdate();
+					}
+				}
+				
+				String message = "User successfully deleted.";
+			    request.setAttribute("message", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/deleteUser.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
 			
 		}catch (Exception ex) {
 			ex.printStackTrace();

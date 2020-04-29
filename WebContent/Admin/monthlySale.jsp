@@ -39,8 +39,8 @@
                 <TR>
                         <TD> <%= output.getString("rid") %></TD>
                         <TD> <%= output.getString("date") %></TD>
-                        <TD> <%= output.getString("usernameCustomer") %></TD>
-                        <TD> <%= output.getString("fare") %></TD>
+                        <TD> <%= output.getString("customerUsername") %></TD>
+                        <TD> <%= output.getString("fee") %></TD>
                 </TR>
             <%
         }
