@@ -14,9 +14,6 @@ import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import POJOs.TrainSchedule;
 
@@ -55,7 +52,7 @@ public class search extends HttpServlet {
 		// TODO Auto-generated method stub
 
 		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
-		
+		HttpSession session=request.getSession(); 
 		
 		try {
 			//Get the database connection
@@ -74,7 +71,10 @@ public class search extends HttpServlet {
 			
 			String query = "SELECT * FROM RailwayBookingSystem.Schedule";
 			
-			if(request.getParameter("showAllStops") != null) {
+			if(request.getParameter("showTrains") != null) {
+				session.setAttribute("da", null);
+				session.setAttribute("o", null);
+				session.setAttribute("de", null);
 				all = stmt.executeQuery(query);
 			}
 			else if(request.getParameter("showStops") != null) {
@@ -86,7 +86,7 @@ public class search extends HttpServlet {
 				
 					if (!date.isEmpty()) {
 						query += " departureDatetime like \"" + date + "%\""; 
-						request.setAttribute("da", date);
+						session.setAttribute("da", date);
 					}
 					
 					if (!sorigin.isEmpty()) {
@@ -95,7 +95,7 @@ public class search extends HttpServlet {
 						} else {
 							query += " origin = \"" + sorigin + "\"";
 						}
-						request.setAttribute("o", sorigin);
+						session.setAttribute("o", sorigin);
 					}
 					
 					if (!sdestination.isEmpty()) {
@@ -104,11 +104,36 @@ public class search extends HttpServlet {
 						} else {
 							query += " destination = \"" + sdestination + "\"";						
 						}
-						request.setAttribute("de", sdestination);
+						session.setAttribute("de", sdestination);
 					}
 				
 				}
+
+			} else if (session.getAttribute("da") != null || session.getAttribute("o") != null || session.getAttribute("de") != null) {
+				query += " WHERE";
+			
+				if (session.getAttribute("da") != null) {
+					query += " departureDatetime like \"" + session.getAttribute("da") + "%\""; 
+				}
+				
+				if (session.getAttribute("o") != null) {
+					if (session.getAttribute("da") != null) {
+						query += " AND origin = \"" + session.getAttribute("o")  + "\"";
+					} else {
+						query += " origin = \"" + session.getAttribute("o") + "\"";
+					}
+				}
+				
+				if (session.getAttribute("de") != null) {
+					if (session.getAttribute("da") != null || session.getAttribute("o") != null) {
+						query += " AND destination = \"" + session.getAttribute("de") + "\"";
+					} else {
+						query += " destination = \"" + session.getAttribute("de") + "\"";						
+					}
+				}
+			
 			}
+				
 			
 			
 			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
@@ -132,8 +157,7 @@ public class search extends HttpServlet {
 				query += " ORDER BY fare";
 				
 			}
-			
-				
+
 			all = stmt.executeQuery(query);
 			
 			ArrayList<TrainSchedule> trains = new ArrayList<TrainSchedule>();
@@ -160,7 +184,7 @@ public class search extends HttpServlet {
 	    	request.setAttribute("list", trains);
 	    	request.setAttribute("slist", nums);	
 			
-	    	System.out.println(query);
+//	    	System.out.println(query);
 	    	
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -170,6 +194,7 @@ public class search extends HttpServlet {
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/schedule.jsp");
 		dispatcher.forward(request, response);
+		
 			
 		
 	}

@@ -104,6 +104,9 @@ public class redirect extends HttpServlet {
 					result.next(); 
 			        session.setAttribute("Name", result.getString("username"));  
 			        session.setAttribute("Level", result.getString("level"));
+			        session.setAttribute("da", null);
+					session.setAttribute("o", null);
+					session.setAttribute("de", null);
 			        if(result.getString("level").equals("C")) {
 			        	RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 			        	dispatcher.forward(request, response);
