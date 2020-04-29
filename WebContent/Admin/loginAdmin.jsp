@@ -38,11 +38,21 @@ Modify/Delete User:
 Generate Monthly Sales Report:
 <br>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
-<table>
-<tr>    
-<td>Month:</td><td><input type="text" name="month"></td>
-</tr>
-</table>
+<select name="optionsMonth">
+  <option value="0"></option>
+  <option value="1">January</option>
+  <option value="2">February</option>
+  <option value="3">March</option>
+  <option value="4">April</option>
+  <option value="5">May</option>
+  <option value="6">June</option>
+  <option value="7">July</option>
+  <option value="8">August</option>
+  <option value="9">September</option>
+  <option value="10">October</option>
+  <option value="11">November</option>
+  <option value="12">December</option>
+</select>
 <input type ="submit" name = "getMonthlySales" value = "Go">
 </form>
 <br><br>
@@ -69,12 +79,13 @@ List Reservations By:
 
 <body>
 Listing of Revenue Per:
-<select id="optionsRevenue">
-  <option value="tl">Transit Line</option>
-  <option value="dc">Destination City</option>
-  <option value="cn2">Customer Name</option>
-</select>
+
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
+<select name="optionsRevenue">
+  <option value="transitLine">Transit Line</option>
+  <option value="destination">Destination City</option>
+  <option value="customerUsername">Customer Username</option>
+</select>
 <input type ="submit" name = "getRevenues" value = "Go">
 </form>
 <br><br>
