@@ -95,6 +95,11 @@ Listing of Revenue Per:
 </form>
 <br><br>
 
+<form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
+<input type ="submit" name = "mostActive" value = "Top 5 Active Transit Lines">
+</form>
+<br><br>
+
 <form method="get" action="${pageContext.request.contextPath}/redirect">
 <input type="submit" name = "logoutButton" value="logout">
 </form>

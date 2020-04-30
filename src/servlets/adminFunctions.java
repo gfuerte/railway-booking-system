@@ -75,6 +75,10 @@ public class adminFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/bestCustomer.jsp");
 			dispatcher.forward(request, response);
 		}
+		else if(request.getParameter("mostActive") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/mostActive.jsp");
+			dispatcher.forward(request, response);
+		}
 		else {
 			ResultSet result = null;
 			try {
