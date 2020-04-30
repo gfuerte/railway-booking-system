@@ -13,10 +13,12 @@
         
         ResultSet output = statement.executeQuery(query);
         %>
+            <div align="center">
+            <h2>MONTHLY SALES</h2>
             <TABLE BORDER="1">
                 <TR>
                     <TH>Reservation ID</TH>
-                    <TH>Date</TH>
+                    <TH>Date and Time</TH>
                     <TH>Username</TH>
                     <TH>Fare</TH>
                 </TR>
@@ -34,6 +36,7 @@
         }
         %>
             </TABLE>
+            </div>
 	<form method="get" action="${pageContext.request.contextPath}/adminFunctions">
 		<input type="submit" name = "goBack" value="Return">
 	</form>

@@ -13,7 +13,8 @@
         
         ResultSet output = statement.executeQuery(query);
         %>
-        	<body> BEST CUSTOMER
+        	<div align="center">
+        	<h2>BEST CUSTOMER</h2>
             <TABLE BORDER="1">
                 <TR>
                     <TH>Username</TH>
@@ -35,6 +36,7 @@
         }
         %>
             </TABLE>
+            </div>
 	<form method="get" action="${pageContext.request.contextPath}/adminFunctions">
 		<input type="submit" name = "goBack" value="Return">
 	</form>

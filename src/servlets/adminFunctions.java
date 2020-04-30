@@ -60,14 +60,49 @@ public class adminFunctions extends HttpServlet{
 		}
 		
 		else if(request.getParameter("getMonthlySales") != null) {
+			if(request.getParameter("optionsMonth").contentEquals("none")) {
+				String message = "Please select a month.";
+			    request.setAttribute("message1", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/loginAdmin.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/monthlySale.jsp");
 			dispatcher.forward(request, response);
 		}
-		else if(request.getParameter("getReservations") != null) {
+		else if(request.getParameter("getReservationsByTrain") != null) {
+			if(request.getParameter("transitLine").isEmpty() || request.getParameter("trainNum").isEmpty()) {
+				String message = "Please fill out both train information fields.";
+			    request.setAttribute("message2", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/loginAdmin.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/reservationList.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		else if(request.getParameter("getReservationsByCus") != null) {
+			if(request.getParameter("cname").isEmpty()) {
+				String message = "Please fill out customer username field.";
+			    request.setAttribute("message3", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/loginAdmin.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/reservationList.jsp");
 			dispatcher.forward(request, response);
 		}
 		else if(request.getParameter("getRevenues") != null) {
+			if(request.getParameter("optionsRevenue").contentEquals("none")) {
+				String message = "Please select an option.";
+			    request.setAttribute("message4", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/loginAdmin.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin/revenueList.jsp");
 			dispatcher.forward(request, response);
 		}

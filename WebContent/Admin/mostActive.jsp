@@ -14,7 +14,8 @@
         
         ResultSet output = statement.executeQuery(query);
         %>
-        	<body> Top 5 Active Transit Lines
+        	<div align="center">
+            <h2>TOP 5 ACTIVE TRANSIT LINES</h2>
             <TABLE BORDER="1">
                 <TR>
                     <TH>Transit Line</TH>
@@ -33,6 +34,7 @@
         }
         %>
             </TABLE>
+            </div>
 	<form method="get" action="${pageContext.request.contextPath}/adminFunctions">
 		<input type="submit" name = "goBack" value="Return">
 	</form>

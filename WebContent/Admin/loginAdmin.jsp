@@ -15,17 +15,15 @@ form {
 Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
 <br><br>
 
-<body>
-Add New User:
+<div align="center">
+<h2>Add New User:</h2>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <input type ="submit" name = "AddCus" value = "Add New Customer ">
 <input type ="submit" name = "AddEmp" value = "Add New Customer Representative">
 </form>
 <br><br>
 
-<body>
-Modify/Delete User:
-<br>
+<h2>Modify/Delete User:</h2>
 
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <input type ="submit" name = "ModifyCus" value = "Modify Customer">
@@ -34,11 +32,10 @@ Modify/Delete User:
 </form>
 <br><br>
 
-<body>
-Generate Monthly Sales Report:
-<br>
+<h2>Generate Monthly Sales Report:</h2>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <select name="optionsMonth">
+  <option value="none"></option>
   <option value="1">January</option>
   <option value="2">February</option>
   <option value="3">March</option>
@@ -54,53 +51,58 @@ Generate Monthly Sales Report:
 </select>
 <input type ="submit" name = "getMonthlySales" value = "Go">
 </form>
+<br><br>${message1}
 <br><br>
 
-
+<h2>List Reservations By:</h2>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
-List Reservations By:
+<h3>Train Information</h3>
 <table>
 <tr>    
 <td>Transit Line:</td><td><input type="text" name="transitLine"></td>
-<td>  AND  Train Number:</td><td><input type="text" name="trainNum"></td>
 </tr>
 </table>
-	OR
+<table>
+<tr>
+<td>Train Number:</td><td><input type="text" name="trainNum"></td>
+</tr>
+</table>
+<input type ="submit" name = "getReservationsByTrain" value = "Go">
+<br><br>${message2}
 <br>
+<h3>Customer Information</h3>
 <table>
 <tr>    
 <td>Customer Username:</td><td><input type="text" name="cname"></td>
 </tr>
 </table>
-<input type ="submit" name = "getReservations" value = "Go">
+<input type ="submit" name = "getReservationsByCus" value = "Go">
 </form>
+<br><br>${message3}
 <br><br>
 
-<body>
-Listing of Revenue Per:
-
+<h2>Listing of Revenue Per:</h2>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <select name="optionsRevenue">
+  <option value="none"></option>
   <option value="transitLine">Transit Line</option>
   <option value="destination">Destination City</option>
   <option value="customerUsername">Customer Username</option>
 </select>
 <input type ="submit" name = "getRevenues" value = "Go">
 </form>
+<br><br>${message4}
 <br><br>
 
+<h2>Other Actions:</h2>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <input type ="submit" name = "bestCus" value = "Best Customer">
-</form>
-<br><br>
-
-<form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <input type ="submit" name = "mostActive" value = "Top 5 Active Transit Lines">
 </form>
 <br><br>
 
 <form method="get" action="${pageContext.request.contextPath}/redirect">
-<input type="submit" name = "logoutButton" value="logout">
+<input type="submit" name = "logoutButton" value="Logout">
 </form>
-</body>
+</div>
 </html>
