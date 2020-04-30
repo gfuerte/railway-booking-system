@@ -135,21 +135,13 @@ public class reservationOptions extends HttpServlet {
 								departure = format.format(departureTime);
 								arrival = format.format(arrivalTime);
 								
-								System.out.println("train " + trainNum + " leaves at: " + format.format(departureDatetime));
-								System.out.println("it travels for: " + travelTime);
-								System.out.println("it arrives at origin at: " + departure);
-								System.out.println("it travels for: " + minTravel);
-								System.out.println("it arrives at destination at: " + arrival);
-								
 								possibleTrains.add(new Train(trainNum, line, selectedOrigin, oid, selectedDestination, did, availableSeats, departure, arrival, fare, minTravel, numStops));
 							}
 						} catch (Exception ex) { ex.printStackTrace(); }	
 					}
 					if(possibleTrains.size() > 0) {
 						System.out.println("Sucess: Found Trains");
-						for(int j = 0; j < possibleTrains.size(); j++) {
-							System.out.println("possible train: " + possibleTrains.get(j).getTrainNum());
-						}
+						
 						request.setAttribute("availableTrainsRequest", possibleTrains);
 						session.setAttribute("availableTrainsSession", possibleTrains);
 						RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");

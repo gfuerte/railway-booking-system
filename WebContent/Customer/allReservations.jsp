@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -16,24 +17,31 @@
     		<th>Date Created</th>
         	<th>Reservation Number</th>
         	<th>Train Number</th>
+        	<th>Transit Line</th>
             <th>Origin</th>
             <th>Destination</th>
             <th>Departure Time</th>
             <th>Arrival Time</th>
-            <th>Fare</th>
-            <th>Transit Line</th>
+            <th>Total Fee</th>
+            <th>Seat Number</th>
+            <th>Ticket Type</th>
+            
         </tr>
         <c:forEach var="x" items="${current}">
             <tr>
             	<td><c:out value="${x.created}" /></td>
             	<td><c:out value="${x.rid}" /></td>
             	<td><c:out value="${x.trainNum}" /></td>
+            	<td><c:out value="${x.line}" /></td>
                 <td><c:out value="${x.origin}" /></td>
                 <td><c:out value="${x.destination}" /></td>
                 <td><c:out value="${x.departure}" /></td>
                 <td><c:out value="${x.arrival}" /></td>
-                <td><c:out value="${x.fare}" /></td>
-                <td><c:out value="${x.line}" /></td>
+                <fmt:setLocale value = "en_US"/>           
+                <c:set var ="fee" value="${x.fee}"/>
+                <td><fmt:formatNumber value = "${fee}" type = "currency"/></td>
+                <td><c:out value="${x.seat}" /></td>
+                <td><c:out value="${x.ticketInfo}" /></td>
              </tr>
         </c:forEach>
 	</table>
@@ -58,37 +66,37 @@
     		<th>Date Created</th>
         	<th>Reservation Number</th>
         	<th>Train Number</th>
+        	<th>Transit Line</th>
             <th>Origin</th>
             <th>Destination</th>
             <th>Departure Time</th>
             <th>Arrival Time</th>
-            <th>Fare</th>
-            <th>Transit Line</th>
+            <th>Total Fee</th>
+            <th>Seat Number</th>
+            <th>Ticket Type</th>
+            
         </tr>
         <c:forEach var="x" items="${past}">
             <tr>
             	<td><c:out value="${x.created}" /></td>
             	<td><c:out value="${x.rid}" /></td>
             	<td><c:out value="${x.trainNum}" /></td>
+            	<td><c:out value="${x.line}" /></td>
                 <td><c:out value="${x.origin}" /></td>
                 <td><c:out value="${x.destination}" /></td>
                 <td><c:out value="${x.departure}" /></td>
                 <td><c:out value="${x.arrival}" /></td>
-                <td><c:out value="${x.fare}" /></td>
-                <td><c:out value="${x.line}" /></td>
+                <fmt:setLocale value = "en_US"/>           
+                <c:set var ="fee" value="${x.fee}"/>
+                <td><fmt:formatNumber value = "${fee}" type = "currency"/></td>
+                <td><c:out value="${x.seat}" /></td>
+                <td><c:out value="${x.ticketInfo}" /></td>
              </tr>
         </c:forEach>
 	</table>
 	
 </div>
-	
-	
-	
-	
-	
-	
-	
-		
+			
 <br><br>
 <div id="backButton" align="center">
 	<form method="get" action="${pageContext.request.contextPath}/allReservations">

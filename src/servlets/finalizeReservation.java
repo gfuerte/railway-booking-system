@@ -3,7 +3,6 @@ package servlets;
 import java.io.*;
 import java.util.*;
 import java.sql.*;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -93,8 +92,6 @@ public class finalizeReservation extends HttpServlet {
 		    		departure = new Timestamp(d.getTime());
 		    		arrival = new Timestamp(a.getTime());
 	    		} catch (ParseException e) { };
-	    		System.out.println("departure: " + departure);
-	    		System.out.println("arrival: " + arrival);
 	    		
 	    		//Ticket
 	    		int value = Integer.parseInt(ticket);
@@ -124,11 +121,11 @@ public class finalizeReservation extends HttpServlet {
 	    			ticketType = "Round Trip";
 	    		} else if (value == 7) { //wt
 	    			fee = fare*7;
-	    			note = "Open";
+	    			note = "";
 	    			ticketType = "Weekly Ticket";
 	    		} else if (value == 8) { //mt
 	    			fee = fare*28;
-	    			note = "Open";
+	    			note = "";
 	    			ticketType = "Monthly Ticket";
 	    		}
 	    		
@@ -137,11 +134,11 @@ public class finalizeReservation extends HttpServlet {
 	    		} else if(trainClass.equals("First")) {
 	    			fee = fee*1.5;
 	    		}
+	    		System.out.println(trainClass + " - " + ticketType + " " + note);
 	    		fee = Math.round(fee*100.0)/100.0;
 	    		
 	    		//Seat
 	    		String action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
-	    		System.out.println("action is: " + action);
 	    		ResultSet query = getQuery(action);
 	    		try {
 	    			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
@@ -150,7 +147,7 @@ public class finalizeReservation extends HttpServlet {
 	    			
 	    			while(query.next()) seat = query.getInt("avaliableSeats");
 	    			
-	    			if(fee <= 0 || departure == null || arrival == null || line == null || origin == null || destination == null || departure == null || arrival == null || username == null || note == null || ticketType == null || seat <= 0) {
+	    			if(fee <= 0 || departure == null || arrival == null || line == null || origin == null || destination == null || departure == null || arrival == null || username == null || ticketType == null || seat <= 0) {
 	    				request.setAttribute("selectedTrainRequest", selected);
 	    	    		request.setAttribute("owa", fare);
 	    	    		request.setAttribute("owc", fare/2);
@@ -167,9 +164,7 @@ public class finalizeReservation extends HttpServlet {
 	    				dispatcher.forward(request, response);
 	    			}
 	    			
-	    			System.out.println(seat);
 	    			String update = "UPDATE RailwayBookingSystem.Schedule SET avaliableSeats=avaliableSeats-1 WHERE train=" + trainNum + ";";
-	    			System.out.println(update);
 	    			PreparedStatement statement = con.prepareStatement(update);
 	    			statement.executeUpdate();
 	    			
@@ -198,9 +193,9 @@ public class finalizeReservation extends HttpServlet {
 	    			
 	    			message = "Successfully Created Reservation";
 				    request.setAttribute("success", message);
-				    RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/allReservations.jsp");
+				    
+					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 					dispatcher.forward(request, response);
-	    			
 	    		} catch (Exception ex) { ex.printStackTrace(); }
 	    	} else {
 	    		request.setAttribute("selectedTrainRequest", selected);

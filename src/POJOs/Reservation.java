@@ -14,6 +14,7 @@ public class Reservation {
 	public String note;
 	public String ticket;
 	public int seat;
+	public String ticketInfo;
 	
 	public Reservation(String created, int rid, int trainNum, String origin, String destination, 
 			String departure, String arrival, double fee, String line, String trainClass, String note, String ticket, int seat) {
@@ -30,6 +31,11 @@ public class Reservation {
 		this.note = note;
 		this.ticket = ticket;
 		this.seat = seat;
+		if(note == null || note.equals("")) {
+			this.ticketInfo = trainClass + " Class - " + ticket; 
+		} else {
+			this.ticketInfo = trainClass + " Class - " + ticket + " " + note;
+		}
 	}
 	
 	public String getCreated(){
@@ -82,5 +88,9 @@ public class Reservation {
 	
 	public int getSeat() {
 	 	return this.seat;
+	}
+	
+	public String getTicketInfo() {
+		return this.ticketInfo;
 	}
 }

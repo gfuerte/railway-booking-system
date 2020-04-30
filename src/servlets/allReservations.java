@@ -50,12 +50,13 @@ public class allReservations extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		SimpleDateFormat format =  new SimpleDateFormat ("yyyy-MM-dd");
+		SimpleDateFormat simple =  new SimpleDateFormat ("yyyy-MM-dd");
+		SimpleDateFormat extended =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
 		
         HttpSession session = request.getSession();  
         String username = (String) session.getAttribute("Name");
         Timestamp stamp = new Timestamp(System.currentTimeMillis());
-        String currentDate = format.format(stamp);
+        String currentDate = simple.format(stamp);
         
 		String message = "";
 	    request.setAttribute("notice", message);
@@ -74,16 +75,25 @@ public class allReservations extends HttpServlet {
 			while(query.next()) {
 				if(query.getString("customerUsername").equals(username)) {
 					int rid = query.getInt("rid");
-					double fare = query.getDouble("fare");
-					String created = format.format(query.getTimestamp("date"));
 					int trainNum = query.getInt("train");
+					String line = query.getString("transitLine");
+					String origin = query.getString("origin");
+					String destination = query.getString("destination");
+					String departure = extended.format(query.getTimestamp("departureDatetime"));
+					String arrival = extended.format(query.getTimestamp("arrivalDatetime"));
+					double fee = query.getDouble("fee");
+					int seat = query.getInt("seat");
+					String trainClass = query.getString("class");
+					String note = query.getString("note");
+					String ticketType = query.getString("ticketType");
 					
-					if(created.compareTo(currentDate) >= 0) {
+					String departureDate = simple.format(query.getTimestamp("departureDatetime"));
+					if(departureDate.compareTo(currentDate) >= 0) {
 					//current
-						insertReservation(current, username, created, rid, trainNum, fare);
+						current.add(new Reservation(currentDate, rid, trainNum, origin, destination, departure, arrival, fee, line, trainClass, note, ticketType, seat));
 					} else {
 					//past
-						insertReservation(past, username, created, rid, trainNum, fare);
+						past.add(new Reservation(currentDate, rid, trainNum, origin, destination, departure, arrival, fee, line, trainClass, note, ticketType, seat));
 					}
 
 					request.setAttribute("current", current);
@@ -112,30 +122,5 @@ public class allReservations extends HttpServlet {
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/allReservations.jsp");
 		dispatcher.forward(request, response);
-	}
-
-	public void insertReservation(ArrayList<Reservation> list, String username, String created, int rid, int trainNum, double fare) {
-		SimpleDateFormat format =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
-			Statement stmt = con.createStatement();
-			String command = "SELECT * FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum;
-			ResultSet query = stmt.executeQuery(command);
-			
-			while(query.next()) {
-				String origin = query.getString("origin");
-				String destination = query.getString("destination");
-		    	String departure = format.format(query.getTimestamp("departureDatetime"));
-		    	String arrival = format.format(query.getTimestamp("arrivalDatetime"));
-		    	String line = query.getString("transitLine");
-		    	
-		    	//list.add(new Reservation(created, rid, trainNum, origin, destination, departure, arrival, fare, line));
-		    	break;
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 }
