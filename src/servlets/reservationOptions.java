@@ -86,9 +86,6 @@ public class reservationOptions extends HttpServlet {
 			if (selectedOrigin != null && selectedDestination != null && !selectedOrigin.isEmpty() && !selectedDestination.isEmpty()) {
 				ArrayList<Stop> possibleLines = new ArrayList<>();
 				possibleLines = getTransitLine(selectedOrigin, selectedDestination);
-				for(int i = 0; i < possibleLines.size(); i++) {
-					System.out.println("possible line: " + possibleLines.get(i).line);
-				}
 				
 				if (possibleLines.size() > 0) {
 					System.out.println("Sucess: Found Transit Lines");
@@ -96,7 +93,6 @@ public class reservationOptions extends HttpServlet {
 					
 					for(int i = 0; i < possibleLines.size(); i++) {
 						String line = possibleLines.get(i).getLine();
-						System.out.println("FOR LINE: " + line);
 						int oid = possibleLines.get(i).getStation1();
 						int did = possibleLines.get(i).getStation2();
 						double fare = possibleLines.get(i).getFare();

@@ -134,7 +134,6 @@ public class finalizeReservation extends HttpServlet {
 	    		} else if(trainClass.equals("First")) {
 	    			fee = fee*1.5;
 	    		}
-	    		System.out.println(trainClass + " - " + ticketType + " " + note);
 	    		fee = Math.round(fee*100.0)/100.0;
 	    		
 	    		//Seat
