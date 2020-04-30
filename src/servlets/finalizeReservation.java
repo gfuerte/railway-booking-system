@@ -82,7 +82,7 @@ public class finalizeReservation extends HttpServlet {
 	    		String username = (String) session.getAttribute("Name");
 	    		String note = null;
 	    		String ticketType = null;
-	    		int seat = -1;
+	    		String seat = null;
 	    		
 	    		Timestamp departure = null;
 	    		Timestamp arrival = null;
@@ -137,17 +137,46 @@ public class finalizeReservation extends HttpServlet {
 	    		fee = Math.round(fee*100.0)/100.0;
 	    		
 	    		//Seat
-	    		String action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
-	    		ResultSet query = getQuery(action);
+	    		String action = "SELECT * FROM RailwayBookingSystem.Train WHERE idTrain=" + trainNum + ";";
+	    		System.out.println("1: " + action);
+	    		ResultSet trainQuery = getQuery(action);
+	    		action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
+	    		System.out.println("2: " + action);
+	    		ResultSet scheduleQuery = getQuery(action);
 	    		try {
 	    			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 	    			Class.forName("com.mysql.jdbc.Driver");
 	    			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
 	    			
-	    			while(query.next()) seat = query.getInt("avaliableSeats");
+	    			int numSeats = -1;
+	    			while(trainQuery.next()) numSeats = trainQuery.getInt("numSeats");
 	    			
-	    			if(fee <= 0 || departure == null || arrival == null || line == null || origin == null || destination == null || departure == null || arrival == null || username == null || ticketType == null || seat <= 0) {
-	    				request.setAttribute("selectedTrainRequest", selected);
+	    			int availableSeats = -1;
+	    			while(scheduleQuery.next()) availableSeats = scheduleQuery.getInt("avaliableSeats");
+	    			
+	    			if (availableSeats > 0 && numSeats > 0 && numSeats >= availableSeats) {
+	    				action = "SELECT * FROM RailwayBookingSystem.Reservations WHERE class=\"" + trainClass + "\" AND train=" + trainNum + ";";
+	    				System.out.println("3: " + action);
+	    				ResultSet reservationsQuery = getQuery(action);
+	    				ArrayList<Integer> seatsTaken = new ArrayList<>();
+	    				while(reservationsQuery.next()) {
+	    					seatsTaken.add(Integer.parseInt(reservationsQuery.getString("seat").substring(1)));
+	    				}
+	    				for(int i = 1; i <= numSeats; i++) {
+	    					if(seatsTaken.indexOf(i) == -1) {
+	    						seat = trainClass.substring(0,1) + Integer.toString(i);
+	    						break;
+	    					}
+	    				}
+	    			} else {
+	    				System.out.println("Failure: Database Error - Forcing Error");
+	    				fee = -1;
+	    			}
+	    			
+	    			System.out.println(seat);
+	    			
+	    			if(fee <= 0 || departure == null || arrival == null || line == null || origin == null || destination == null || departure == null || arrival == null || username == null || ticketType == null || seat == null) {
+	    				/*request.setAttribute("selectedTrainRequest", selected);
 	    	    		request.setAttribute("owa", fare);
 	    	    		request.setAttribute("owc", fare/2);
 	    	    		request.setAttribute("owd", fare/2);
@@ -155,11 +184,11 @@ public class finalizeReservation extends HttpServlet {
 	    	    		request.setAttribute("rtc", fare);
 	    	    		request.setAttribute("rtd", fare);
 	    	    		request.setAttribute("wt", fare*7);
-	    	    		request.setAttribute("mt", fare*28);  
+	    	    		request.setAttribute("mt", fare*28);  */
 	    	    		
 	    		    	message = "Something Went Wrong. Please Logout And Retry Again";
-	    			    request.setAttribute("finalizeMessage", message);
-	    			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/finalizeReservation.jsp");
+	    			    request.setAttribute("reservationMessage", message);
+	    			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 	    				dispatcher.forward(request, response);
 	    			}
 	    			
@@ -184,14 +213,14 @@ public class finalizeReservation extends HttpServlet {
 	    			insertPS.setString(11, trainClass);
 	    			insertPS.setString(12, note);
 	    			insertPS.setString(13, ticketType);
-	    			insertPS.setInt(14, seat);
+	    			insertPS.setString(14, seat);
 	    			
 	    			
 	    			System.out.println(insertPS);
 	    			insertPS.executeUpdate();
 	    			
 	    			message = "Successfully Created Reservation";
-				    request.setAttribute("success", message);
+				    request.setAttribute("reservationMessage", message);
 				    
 					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 					dispatcher.forward(request, response);

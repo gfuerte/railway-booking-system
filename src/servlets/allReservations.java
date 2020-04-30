@@ -71,7 +71,7 @@ public class allReservations extends HttpServlet {
 			
 			ArrayList<Reservation> current = new ArrayList<>();
 			ArrayList<Reservation> past = new ArrayList<>();
-			
+					
 			while(query.next()) {
 				if(query.getString("customerUsername").equals(username)) {
 					int rid = query.getInt("rid");
@@ -82,7 +82,7 @@ public class allReservations extends HttpServlet {
 					String departure = extended.format(query.getTimestamp("departureDatetime"));
 					String arrival = extended.format(query.getTimestamp("arrivalDatetime"));
 					double fee = query.getDouble("fee");
-					int seat = query.getInt("seat");
+					String seat = query.getString("seat");
 					String trainClass = query.getString("class");
 					String note = query.getString("note");
 					String ticketType = query.getString("ticketType");
@@ -104,9 +104,18 @@ public class allReservations extends HttpServlet {
 			if(request.getParameter("cancel") != null) {
 				String rid = request.getParameter("reservationNumber");
 				if(rid != null && !rid.isEmpty()) {
+					String action = "SELECT train FROM Reservations WHERE rid=" + rid + ";";
+					ResultSet reservationQuery = getQuery(action);
+					int train = -1;
+					while(reservationQuery.next()) train = reservationQuery.getInt("train");
+					
 					String delete = "DELETE FROM Reservations WHERE rid=" + rid + ";";
-					PreparedStatement statement = con.prepareStatement(delete);
-					statement.executeUpdate();
+					PreparedStatement statement1 = con.prepareStatement(delete);
+					statement1.executeUpdate();
+					
+					String update = "UPDATE RailwayBookingSystem.Schedule SET avaliableSeats=avaliableSeats+1 WHERE train=" + train + ";";
+					PreparedStatement statement2 = con.prepareStatement(update);
+					statement2.executeUpdate();
 					
 					message = "Sucessfully Canceled Reservation";
 				    request.setAttribute("confirmation", message);
@@ -122,5 +131,20 @@ public class allReservations extends HttpServlet {
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/allReservations.jsp");
 		dispatcher.forward(request, response);
+	}
+	
+	public ResultSet getQuery(String action) {
+		try {
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con = DriverManager.getConnection(url, "admin",
+					"dbgroup20");
+			Statement stmt = con.createStatement();
+
+			ResultSet query = stmt.executeQuery(action);
+
+			return query;
+		} catch (Exception ex) { ex.printStackTrace(); }
+		return null;
 	}
 }

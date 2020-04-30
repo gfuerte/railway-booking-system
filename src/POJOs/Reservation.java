@@ -13,11 +13,11 @@ public class Reservation {
 	public String trainClass;
 	public String note;
 	public String ticket;
-	public int seat;
+	public String seat;
 	public String ticketInfo;
 	
 	public Reservation(String created, int rid, int trainNum, String origin, String destination, 
-			String departure, String arrival, double fee, String line, String trainClass, String note, String ticket, int seat) {
+			String departure, String arrival, double fee, String line, String trainClass, String note, String ticket, String seat) {
 		this.created = created;
 		this.rid = rid;
 		this.trainNum = trainNum;
@@ -86,7 +86,7 @@ public class Reservation {
 	 	return this.ticket;
 	}
 	
-	public int getSeat() {
+	public String getSeat() {
 	 	return this.seat;
 	}
 	

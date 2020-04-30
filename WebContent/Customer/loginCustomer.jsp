@@ -36,7 +36,7 @@ form {
 	<form method="get" action="${pageContext.request.contextPath}/redirect">
 	<input type="submit" name = "logoutButton" value="logout">
 	</form>
-	<p>${success}</p>
+	<p>${reservationMessage}</p>
 </div>
 </body>
 </html>
