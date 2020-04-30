@@ -137,6 +137,7 @@ public class finalizeReservation extends HttpServlet {
 	    		} else if(trainClass.equals("First")) {
 	    			fee = fee*1.5;
 	    		}
+	    		fee = Math.round(fee*100.0)/100.0;
 	    		
 	    		//Seat
 	    		String action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
