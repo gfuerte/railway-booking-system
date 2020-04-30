@@ -5,8 +5,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src=https://code.jquery.com/jquery-1.12.4.js></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <meta charset="ISO-8859-1">
 <title>Add Train Schedule</title>
+
 </head>
 <body>
 
@@ -44,16 +48,31 @@
 		<br><br>
 		
 		<h3>Select Date</h3>
-			<input type="date" name="selectDate" value="Date">
-		<br>Date MUST be in format YYYY-MM-DD
+			<input type="date" id="datepicker" name="selectDate" value="Date">
+			<script>
+				$( function() {
+    				$.datepicker.setDefaults({
+        				onClose:function(date, inst){
+        	    			$("#selectedDtaeVal").html(date);
+        				}
+    				});
+					$( "#datepicker" ).datepicker();
+				});
+			</script>
 		<br><br>
 		
 		<h3>Select Time</h3>
-			<input type="time" name="selectTime" value="Time">
-		<br>Time MUST be in format HH:MM
+			<select name="selectTime">
+				<option disabled selected value="">-     Times     -</option>
+				<c:forEach var="i" items="${timeList}">
+					<option><c:out value="${i}" /></option>
+				</c:forEach>
+			</select>
 		<br><br>
 		
-		<input type="submit" name="addNewSchedule" value="Confirm">
+		
+		<br><br><br>
+		<input type="submit" name="addNewSchedule" value="Add New Schedule">
 	</form>
 		
 	<br><br>
