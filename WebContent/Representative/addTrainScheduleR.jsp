@@ -48,11 +48,12 @@
 		<br><br>
 		
 		<h3>Select Date</h3>
-			<input type="date" id="datepicker" name="selectDate" value="Date">
+			<input type="text" id="datepicker" name="selectDate" value="- Date -">
 			<script>
 				$( function() {
     				$.datepicker.setDefaults({
-        				onClose:function(date, inst){
+    					dateFormat: "yy-mm-dd",
+        				onClose:function(date, inst) {
         	    			$("#selectedDtaeVal").html(date);
         				}
     				});
@@ -61,7 +62,7 @@
 			</script>
 		<br><br>
 		
-		<h3>Select Time</h3>
+		<h3 >Select Time</h3>
 			<select name="selectTime">
 				<option disabled selected value="">-     Times     -</option>
 				<c:forEach var="i" items="${timeList}">
@@ -70,17 +71,17 @@
 			</select>
 		<br><br>
 		
-		
-		<br><br><br>
-		<input type="submit" name="addNewSchedule" value="Add New Schedule">
+		<br><br>
+		<input type="submit" name="addNewSchedule" value="Confirm">
 	</form>
-		
-	<br><br>
+	
+	<br>
 	
 	<form method="get" action="${pageContext.request.contextPath}/representativeFunctions">
 			<input type="submit" name = "returnToScheduleViewR" value="Return">
 	</form>
-	<br><br>${message}
+	
+	<br><br><br>${message}
 	
 </div>
 

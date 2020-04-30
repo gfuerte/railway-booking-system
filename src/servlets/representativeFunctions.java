@@ -78,6 +78,8 @@ public class representativeFunctions extends HttpServlet{
 		
 		if (request.getParameter("addNewSchedule") != null) {			
 			confirmAddSchedule(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
+			dispatcher.include(request, response);
 		}
 		
 	}
@@ -145,7 +147,7 @@ public class representativeFunctions extends HttpServlet{
 			
 		} catch (Exception e) {	
 			e.printStackTrace();
-		}		
+		}
 	}
 	
 	/*
@@ -154,12 +156,88 @@ public class representativeFunctions extends HttpServlet{
 	 */
 	private void confirmAddSchedule(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		// Check that selected origin is part of transit line
-		request.getParameter("selectTransitLine");
-		System.out.println("Northeast Corridor".equals(request.getParameter("selectTransitLine")));
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+
+			// User inputs
+			String transitLine = request.getParameter("selectTransitLine");
+			String origin = request.getParameter("selectOrigin");
+			s = "SELECT idStation FROM Station WHERE name = ?";
+			ps = c.prepareStatement(s);
+			ps.setString(1, origin);
+			ResultSet orig = ps.executeQuery();
+			int o = 0;
+			while (orig.next()) { o = orig.getInt(1); }
+			int train = Integer.parseInt(request.getParameter("selectTrain")); 
+			Date date = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("selectDate"));
+			Date time = new SimpleDateFormat("HH:mm").parse(request.getParameter("selectTime"));
+			Date dt = dateTime(date, time);
+			
+			// Check that selected origin is part of transit line
+			s = "SELECT station1, station2 FROM Route WHERE transitLine = ?";
+			ps = c.prepareStatement(s);
+			ps.setString(1, transitLine);
+			ResultSet possibleOrigins = ps.executeQuery();
+			int po1 = -1, po2 = -1;;
+			while(possibleOrigins.next()) {
+				po1 = possibleOrigins.getInt(1);
+				po2 = possibleOrigins.getInt(2);
+			}
+			if (po1 != o && po2 != o) {
+				PreparedStatement ps1 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po1);
+				PreparedStatement ps2 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po2);
+				ResultSet rs1 = ps1.executeQuery();
+				ResultSet rs2 = ps2.executeQuery();
+				String porig1 = "", porig2 = "";
+				while(rs1.next() && rs2.next()) {
+					porig1 = rs1.getString(1);
+					porig2 = rs2.getString(1);
+				}
+				String m = transitLine + " cannot originate from " + origin + ". " + transitLine + " must originate from " + porig1 + " or " + porig2 +".";
+				request.setAttribute("message", m);
+				getScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
 		
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainScheduleR.jsp");
-		dispatcher.forward(request, response);
+			
+			
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+	
 	}
+	
+	/*
+	 * Combine date and time into one
+	 */
+	private Date dateTime(Date date, Date time) {
+
+	    Calendar aDate = Calendar.getInstance();
+	    aDate.setTime(date);
+
+	    Calendar aTime = Calendar.getInstance();
+	    aTime.setTime(time);
+
+	    Calendar aDateTime = Calendar.getInstance();
+	    aDateTime.set(Calendar.DAY_OF_MONTH, aDate.get(Calendar.DAY_OF_MONTH));
+	    aDateTime.set(Calendar.MONTH, aDate.get(Calendar.MONTH));
+	    aDateTime.set(Calendar.YEAR, aDate.get(Calendar.YEAR));
+	    aDateTime.set(Calendar.HOUR, aTime.get(Calendar.HOUR));
+	    aDateTime.set(Calendar.MINUTE, aTime.get(Calendar.MINUTE));
+	    aDateTime.set(Calendar.SECOND, aTime.get(Calendar.SECOND));
+
+	    return aDateTime.getTime();
+	}   
 
 }
