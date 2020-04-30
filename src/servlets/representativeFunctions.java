@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class adminFunctions
@@ -66,93 +69,78 @@ public class representativeFunctions extends HttpServlet{
 		
 		// Add Train Schedule Menu
 		if(request.getParameter("addScheduleR") != null) {
+			addScheduleOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
 			dispatcher.forward(request, response);
 		}
 		
-		// Submit Add Train Schedule
-		if(request.getParameter("submitAddScheduleR") != null) {
-			addSchedule(request, response);
+		if (request.getParameter("addSelection") != null) {
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+			dispatcher.forward(request, response);
 		}
 		
 	}
 	
+	
 	/*
-	 * Checks to see if schedule with a specified train already exists
-	 * If not, add new schedule into SQL table
+	 * ADDING SCHEDULE
+	 * Gets data for drop down lists - transit lines, origins, available trains
 	 */
-	private void addSchedule(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void addScheduleOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		try {
-		// Connect to SQL database
-		String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
 		
-		// Get fields from user input
-		String origin = request.getParameter("origin");
-		String destination = request.getParameter("destination");
-		String transitLine = request.getParameter("transitline");
-		String departureTime = request.getParameter("departureTime");
-		String arrivalTime = request.getParameter("arrivalTime");
-		String travelTime = request.getParameter("travelTime");
-		String fare = request.getParameter("fare");
-		String train = request.getParameter("train");
-		
-		// Query to execute
-		String s = "";
-		PreparedStatement ps;
-		
-		// Check to see if train exists
-		s = "SELECT train FROM RailwayBookingSystem.Train WHERE idTrain = ?";
-		ps = c.prepareStatement(s);
-		ps.setString(1, train);
-		if (ps.executeQuery() == null) {
-		    request.setAttribute("message", "Train " + train + "does not exist. Cannot schedule route.");
-		    RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
-            dispatcher.forward(request, response);
-            return;
-		}
-		
-		// Check to see if train we want to schedule is already scheduled to run
-		s = "SELECT train FROM RailwayBookingSystem.Schedule WHERE train = ?";
-		ps = c.prepareStatement(s);
-		ps.setString(1, train);
-		if (ps.executeQuery() != null) {
-		    request.setAttribute("message", "Train already running. Cannot create schedule with train " + train + ".");
-		    RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
-            dispatcher.forward(request, response);
-            return;
-		}
-		
-		// Train exists and is not in use - can schedule a route
-	
-		// Check to see that all parameters are filled out
-		if (origin.isEmpty() || destination.isEmpty() || transitLine.isEmpty() ||
-			departureTime.isEmpty() || arrivalTime.isEmpty() || fare.isEmpty() || train.isEmpty()) {
-		    request.setAttribute("message", "Please fill out all parameters to schedule route.");
-		    RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
-            dispatcher.forward(request, response);
-            return;
-		}
-		
-		// Schedule new route in database
-		s = "INSERT INTO RailwayBookingSystem.Schedule(origin, destination, transitLine, availableSeats, stops, departureDatetime, arrivalDatetime, travelTime, fare, train) VALUES (?,?,?,?,?,?,?,?,?)";
-		ps = c.prepareStatement(s);
-		ps.setString(1, origin);
-		ps.setString(2, destination);
-		ps.setString(3, transitLine);
-		ps.setString(4, departureTime);
-		ps.setString(5, arrivalTime);
-		ps.setString(6, travelTime);
-		ps.setString(7, origin);
-		ps.setString(8, origin);
-		ps.setString(9, origin);
-		
-		} catch (Exception e) {
+			// Store results of query
+			ResultSet rs1 = null;
+			ResultSet rs2 = null;
+			ResultSet rs3 = null;
+			ArrayList<String> alTransitLines = new ArrayList<>();
+			ArrayList<String> alOrigins = new ArrayList<>();
+			ArrayList<Integer> alTrains = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT transitLine FROM Route";
+			ps = c.prepareStatement(s);
+			rs1 = ps.executeQuery();
+			while(rs1.next()) { alTransitLines.add(rs1.getString(1)); }
+			request.setAttribute("transitLineList", alTransitLines);
+
+			// Get list of origins
+			s = "(SELECT name FROM Station WHERE idStation IN (SELECT station1 FROM Route)) UNION DISTINCT (SELECT name FROM Station WHERE idStation IN (SELECT station2 FROM Route))";
+			ps = c.prepareStatement(s);
+			rs2 = ps.executeQuery();
+			while(rs2.next()) { alOrigins.add(rs2.getString(1)); }
+			request.setAttribute("originList", alOrigins);
+
+			// Get list of available trains
+			s = "SELECT idTrain FROM Train WHERE idTrain NOT IN (SELECT train FROM Schedule)";
+			ps = c.prepareStatement(s);
+			rs3 = ps.executeQuery();
+			while(rs3.next()) { alTrains.add(rs3.getInt(1)); }
+			request.setAttribute("trainList", alTrains);
+			
+			
+		} catch (Exception e) {	
 			e.printStackTrace();
-		}
+		}		
+	}
+	
+	/*
+	 * ADDING SCHEDULE
+	 * Adds a new schedule if no errors
+	 */
+	private void confirmAddSchedule(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+	
 	}
 
 }

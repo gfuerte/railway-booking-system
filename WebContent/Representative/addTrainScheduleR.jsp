@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,44 +9,62 @@
 <title>Add Train Schedule</title>
 </head>
 <body>
+
 <h1 align="center">Add Train Schedule</h1>
-<br>
-	<div align="center">
-	<form method="post" action="${pageContext.request.contextPath}/representativeFunctions">
-		<table >
-			<tr>    
-				<td>Origin</td><td><input type="text" name="origin"></td>
-			</tr>
-			<tr>
-				<td>Destination</td><td><input type="text" name="destination"></td>
-			</tr>
-			<tr>    
-				<td>Transit Line</td><td><input type="text" name="transitLine"></td>
-			</tr>
-			<tr>    
-				<td>Stops</td><td><input type="text" name="stops"></td>
-			</tr>
-			<tr>    
-				<td>Departure Time</td><td><input type="text" name="departureTime"></td>
-			</tr>
-			<tr>    
-				<td>Arrival Time</td><td><input type="text" name="arrivalTime"></td>
-			</tr>
-			<tr>    
-				<td>Fare</td><td><input type="text" name="fare"></td>
-			</tr>
-			<tr>    
-				<td>Train</td><td><input type="text" name="train"></td>
-			</tr>
-		</table>
-		<br>
-		<input type="submit" name = "submitAddScheduleR" value="Add Schedule">
+
+<div align="center">
+	
+	<form method="post" action="${pageContext.request.contextPath}/representativeFunctions" >
+		
+		<h3>Select Transit Line</h3>	
+			<select name="selectTransitLine">
+				<option disabled selected value="">-   Transit Lines   -</option>
+				<c:forEach var="i" items="${transitLineList}">
+					<option><c:out value="${i}" /></option>
+				</c:forEach>
+			</select>
+		<br><br>
+		
+		<h3>Select Origin</h3>	
+			<select name="selectOrigin">
+				<option disabled selected value="">-     Origins     -</option>
+				<c:forEach var="i" items="${originList}">
+					<option><c:out value="${i}" /></option>
+				</c:forEach>
+			</select>
+		<br><br>
+		
+		<h3>Select Train</h3>	
+			<select name="selectTrain">
+				<option disabled selected value="">-     Trains     -</option>
+				<c:forEach var="i" items="${trainList}">
+					<option><c:out value="${i}" /></option>
+				</c:forEach>
+			</select>
+		<br><br>
+		
+		<h3>Select Date</h3>
+			<input type="date" name="selectDate" value="Date">
+		<br>Date MUST be in format YYYY-MM-DD
+		<br><br>
+		
+		<h3>Select Time</h3>
+			<input type="time" name="selectTime" value="Time">
+		<br>Time MUST be in format HH:MM
+		<br><br>
+		
+		<input type="submit" name="addNewSchedule" value="Confirm">
 	</form>
+		
 	<br><br>
+	
 	<form method="get" action="${pageContext.request.contextPath}/representativeFunctions">
 			<input type="submit" name = "returnToScheduleViewR" value="Return">
 	</form>
 	<br><br>${message}
-	</div>
+	
+</div>
+
 </body>
 </html>
+
