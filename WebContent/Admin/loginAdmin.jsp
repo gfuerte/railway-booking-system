@@ -39,7 +39,6 @@ Generate Monthly Sales Report:
 <br>
 <form action = "${pageContext.request.contextPath}/adminFunctions" method = "post">
 <select name="optionsMonth">
-  <option value="0"></option>
   <option value="1">January</option>
   <option value="2">February</option>
   <option value="3">March</option>
@@ -70,7 +69,7 @@ List Reservations By:
 <br>
 <table>
 <tr>    
-<td>Customer Name:</td><td><input type="text" name="cname"></td>
+<td>Customer Username:</td><td><input type="text" name="cname"></td>
 </tr>
 </table>
 <input type ="submit" name = "getReservations" value = "Go">
