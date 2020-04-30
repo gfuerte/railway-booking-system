@@ -131,7 +131,7 @@ public class allReservations extends HttpServlet {
 		    	String arrival = format.format(query.getTimestamp("arrivalDatetime"));
 		    	String line = query.getString("transitLine");
 		    	
-		    	list.add(new Reservation(created, rid, trainNum, origin, destination, departure, arrival, fare, line));
+		    	//list.add(new Reservation(created, rid, trainNum, origin, destination, departure, arrival, fare, line));
 		    	break;
 			}
 		} catch (Exception ex) {

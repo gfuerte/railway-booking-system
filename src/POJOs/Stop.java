@@ -5,15 +5,15 @@ public class Stop {
 	public int station1;
 	public int station2;
 	public double fare;
-	public int numStop;
+	public int numStops;
 	public int minTravel;
 	
-	public Stop(String line, int station1, int station2, double fare, int numStop, int minTravel) {
+	public Stop(String line, int station1, int station2, double fare, int numStops, int minTravel) {
 		this.line = line;
 		this.station1 = station1;
 		this.station2 = station2;
 		this.fare = fare;
-		this.numStop = numStop;
+		this.numStops = numStops;
 		this.minTravel = minTravel;
 	}
 	
@@ -33,8 +33,8 @@ public class Stop {
 		return this.fare;
 	}
 	
-	public int getNumStop() {
-		return this.numStop;
+	public int getNumStops() {
+		return this.numStops;
 	}
 	
 	public int getMinTravel() {

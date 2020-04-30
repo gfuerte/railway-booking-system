@@ -8,12 +8,15 @@ public class Reservation {
 	public String destination;
 	public String departure;
 	public String arrival;
-	public double fare;
+	public double fee;
 	public String line;
-	//public int seat;
+	public String trainClass;
+	public String note;
+	public String ticket;
+	public int seat;
 	
 	public Reservation(String created, int rid, int trainNum, String origin, String destination, 
-			String departure, String arrival, double fare, String line) {
+			String departure, String arrival, double fee, String line, String trainClass, String note, String ticket, int seat) {
 		this.created = created;
 		this.rid = rid;
 		this.trainNum = trainNum;
@@ -21,8 +24,12 @@ public class Reservation {
 		this.destination = destination;
 		this.departure = departure;
 		this.arrival = arrival;
-		this.fare = fare;
+		this.fee = fee;
 		this.line = line;
+		this.trainClass = trainClass;
+		this.note = note;
+		this.ticket = ticket;
+		this.seat = seat;
 	}
 	
 	public String getCreated(){
@@ -53,15 +60,27 @@ public class Reservation {
 		return this.arrival;
 	}
 	
-	public double getFare() {
-		return this.fare;
+	public double getFee() {
+		return this.fee;
 	}
 	
 	public String getLine() {
 		return this.line;
 	}
 	
-	/*public int getSeat() {
+	public String getTrainClass() {
+	 	return this.trainClass;
+	}
+	
+	public String getNote() {
+		return this.note;
+	}
+	
+	public String getTicket() {
+	 	return this.ticket;
+	}
+	
+	public int getSeat() {
 	 	return this.seat;
-	}*/
+	}
 }

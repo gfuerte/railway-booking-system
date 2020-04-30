@@ -9,6 +9,7 @@
 </head>
 <body>
 <div align="center">
+	<h3 align="center">${success}</h3>
 	<table border="1">
 		<h2 align="center">Current Reservations</h2>
     	<tr>

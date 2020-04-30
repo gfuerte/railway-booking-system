@@ -9,34 +9,32 @@
 </head>
 <body>
 <div align="center">
-	<form method="post" action="${pageContext.request.contextPath}/createReservations">
-		<p>Search Origin <input type="text" name="origin"></p>
-		<p>Search Destination <input type="text" name="destination"></p>
-		<input type="submit" name = "filter" value="Filter">
-		<input type="submit" name="reset" value="Reset Filter">
-	</form>
-	
-	<br>
 	<table border="1">
 		<h2 align="center">Available Trains</h2>
     	<tr>
         	<th>Train Number</th>
+        	<th>Available Seats</th>
+        	<th>Transit Line</th>
             <th>Origin</th>
             <th>Destination</th>
+            <th>Number of Stops</th>
             <th>Departure Time</th>
             <th>Arrival Time</th>
+            <th>Minutes Travel</th>
             <th>Fare</th>
-            <th>Transit Line</th>
         </tr>
-        <c:forEach var="x" items="${list}">
+        <c:forEach var="x" items="${availableTrainsRequest}">
             <tr>
-            	<td><c:out value="${x.trainnum}" /></td>
+            	<td><c:out value="${x.trainNum}" /></td>
+            	<td><c:out value="${x.availableSeats}" /></td> 
+                <td><c:out value="${x.line}" /></td>
                 <td><c:out value="${x.origin}" /></td>
                 <td><c:out value="${x.destination}" /></td>
+                <td><c:out value="${x.numStops}" /></td>
                 <td><c:out value="${x.departure}" /></td>
-                <td><c:out value="${x.arrival}" /></td>
-                <td><c:out value="${x.fare}" /></td>
-                <td><c:out value="${x.transitline}" /></td>    
+                <td><c:out value="${x.arrival}" /></td>    
+                <td><c:out value="${x.minTravel}" /></td> 
+                <td><c:out value="${x.fare}" /></td> 
              </tr>
         </c:forEach>
 	</table>
@@ -46,14 +44,14 @@
 	<form method="post" action="${pageContext.request.contextPath}/createReservations">
 	
 		<p>
-		Select Train Number 
+		Train Numbers
 		<select name="trainNumber">
 			<option disabled selected value="0">-- Choose Number --</option>
-			<c:forEach var="x" items="${list}">
-				<option><c:out value="${x.trainnum}" /></option>
+			<c:forEach var="x" items="${availableTrainsRequest}">
+				<option><c:out value="${x.trainNum}" /></option>
 			</c:forEach>
 		</select>
-		<input type="submit" name="reserve" value="Create Reservation">
+		<input type="submit" name="reserve" value="Select Train">
 		<br><br>${confirmation}
 		</p>
 	</form>

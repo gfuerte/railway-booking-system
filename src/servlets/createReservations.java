@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import POJOs.TrainSchedule;
-import POJOs.Stop;
+import POJOs.Reservation;
+import POJOs.Train; 
 
 /**
  * Servlet implementation class search
@@ -45,7 +45,7 @@ public class createReservations extends HttpServlet {
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		if(request.getParameter("goBack") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservationOptions.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 			dispatcher.forward(request, response);
 		}
 	}
@@ -54,136 +54,51 @@ public class createReservations extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		System.out.println("HERE");
-		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
-        HttpSession session = request.getSession();  
+		HttpSession session = request.getSession();  
 		String message = "";
 	    request.setAttribute("confirmation", message);
 	    
-	    ArrayList<Stop> possibleLines = (ArrayList<Stop>) session.getAttribute("possibleLines");
-	    for(int i = 0; i < possibleLines.size(); i++) {
-	    	System.out.println("From CR: " + possibleLines.get(i).line);
+    	ArrayList<Train> trains = (ArrayList<Train>) session.getAttribute("availableTrainsSession");
+
+	    
+	    if(request.getParameter("reserve") != null) {
+	    	String trainNumber = request.getParameter("trainNumber");
+	    	if(trainNumber != null && !trainNumber.isEmpty()) {
+	    		int index = -1;
+	    		for(int i = 0; i < trains.size(); i++) {
+	    			if(trains.get(i).trainNum == Integer.parseInt(trainNumber)) {
+	    				index = i;
+	    				break;
+	    			}
+	    		}
+	    		if(index == -1) System.out.println("Warning: This should not be happening!");
+
+	    		ArrayList<Train> selectedTrain = new ArrayList<>();
+	    		selectedTrain.add(trains.get(index));
+	    		
+	    		//Set Fares
+	    		double fare = trains.get(index).fare;
+	    		request.setAttribute("owa", fare);
+	    		request.setAttribute("owc", fare/2);
+	    		request.setAttribute("owd", fare/2);
+	    		request.setAttribute("rta", fare*2);
+	    		request.setAttribute("rtc", fare);
+	    		request.setAttribute("rtd", fare);
+	    		request.setAttribute("wt", fare*7);
+	    		request.setAttribute("mt", fare*28);   	
+	    		
+	    		//Redirect
+	    		request.setAttribute("selectedTrainRequest", selectedTrain);
+	    		session.setAttribute("selectedTrainSession", selectedTrain);	
+		    	RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/finalizeReservation.jsp");
+				dispatcher.forward(request, response);
+	    	} else {
+	    		request.setAttribute("availableTrainsRequest", trains);
+	    		message = "Please Select Train Number";
+			    request.setAttribute("confirmation", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");
+				dispatcher.forward(request, response);
+	    	}
 	    }
-		
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
-			Statement stmt = con.createStatement();
-
-			String query = "SELECT * FROM RailwayBookingSystem.Schedule";
-				
-			if (request.getParameter("reset") != null) {
-				query = "SELECT * FROM RailwayBookingSystem.Schedule";
-			} else if (request.getParameter("filter") != null) {
-				String origin = request.getParameter("origin");
-				String destination = request.getParameter("destination");
-				
-				query = "SELECT * FROM RailwayBookingSystem.Schedule";
-				
-				if ((origin!= null && !origin.isEmpty()) || (destination != null &&!destination.isEmpty())) {
-					query += " WHERE";
-				}
-				
-				if (origin!= null && !origin.isEmpty()) {
-					query += " origin LIKE \"" + origin + "%\"";
-				}
-				
-				if (destination != null &&!destination.isEmpty()) {
-					if (!origin.isEmpty()) {
-						query += " AND destination LIKE \"" + destination + "%\"";
-					} else {
-						query += " destination LIKE \"%" + destination + "%\"";
-					}
-				}
-			} 
-			
-			ResultSet all = stmt.executeQuery(query);
-				
-			ArrayList<TrainSchedule> trains = new ArrayList<>();
-		    
-		    while(all.next()) {
-		    	int trainnum = all.getInt("train");
-		    	String origin = all.getString("origin");
-		    	String destination = all.getString("destination");
-		    	String arrival = ft.format(all.getTimestamp("arrivalDatetime"));
-		    	String departure = ft.format(all.getTimestamp("departureDatetime"));
-		    	Double fare = all.getDouble("fare");
-		    	String transitline = all.getString("transitLine");
-		    	
-		    	trains.add(new TrainSchedule(trainnum, origin, destination, arrival, departure, fare, transitline));	
-		    }
-		    
-		    request.setAttribute("list", trains);
-		    if(request.getParameter("reserve") != null) {
-				String trainNumber = request.getParameter("trainNumber");
-				if(trainNumber != null && !trainNumber.isEmpty()) {
-					int rid = (int)(Math.random()*9999); 
-					while (checkRID(rid) == false) rid = (int)(Math.random()*9999);
-					double fare;
-					String username;
-					Timestamp date;
-					int train;
-					
-					for(int i = 0; i < trains.size(); i++) {
-						if((trains.get(i).getTrainnum() == Integer.parseInt(trainNumber))) {	
-							fare = trains.get(i).getFare();
-							username = (String)session.getAttribute("Name");
-							date = new Timestamp(System.currentTimeMillis());
-							train = trains.get(i).getTrainnum();
-							
-							String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fare`,`customerUsername`, `date`, `train`) VALUES (?,?,?,?,?);";
-
-							PreparedStatement statement = con.prepareStatement(insert);
-							statement.setInt(1, rid);
-							statement.setDouble(2, fare);
-							statement.setString(3, username);
-							statement.setTimestamp(4, date);
-							statement.setInt(5, train);
-
-							statement.executeUpdate();
-							
-							message = "Sucessfully Created Reservation";
-						    request.setAttribute("confirmation", message);
-							break;	
-						}
-					}
-				} else {
-					message = "Please Select Train Number";
-				    request.setAttribute("confirmation", message);
-				}
-			}
-			
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");
-		dispatcher.forward(request, response);
-			
-		
-	}
-	
-	public boolean checkRID(int rid) {
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
-			Statement stmt = con.createStatement();
-			ResultSet query = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Reservations WHERE rid=" + rid + ";");
-			
-			int count = 0;
-			while(query.next()) count++;
-			if(count != 0) {
-				return false;
-			} else {
-				return true;
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return false;
 	}
 }
