@@ -46,6 +46,7 @@ public class representativeFunctions extends HttpServlet{
 		
 		// Go back to main Representative Screen
 		if(request.getParameter("returnToMainR") != null) {
+			setupHome(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/loginRepresentative.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -207,6 +208,80 @@ public class representativeFunctions extends HttpServlet{
 		
 	}
 
+	
+	/*
+	 * CUSTOMER REP HOME SCREEN
+	 * Get dropdown options
+	 */
+	private void setupHome(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs = null;
+			ArrayList<String> alTransitLines = new ArrayList<>();
+			ArrayList<Integer> alTrainNumber = new ArrayList<>();
+			ArrayList<String> alOrigin = new ArrayList<>();
+			ArrayList<String> alDestination = new ArrayList<>();
+			ArrayList<String> alStation = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT DISTINCT transitLine FROM Reservations";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { alTransitLines.add(rs.getString(1)); }
+			request.setAttribute("tlList", alTransitLines);
+			rs.close();
+			
+			// Get list of trains
+			s = "SELECT DISTINCT train FROM Reservations";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { alTrainNumber.add(rs.getInt(1)); }
+			request.setAttribute("tnList", alTrainNumber);
+			rs.close();
+			
+			// Get list of origins
+			s = "SELECT DISTINCT origin FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { alOrigin.add(rs.getString(1)); }
+			request.setAttribute("oList", alOrigin);
+			rs.close();
+
+			// Get list of destinations
+			s = "SELECT DISTINCT destination FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { alDestination.add(rs.getString(1)); }
+			request.setAttribute("dList", alDestination);
+			rs.close();
+			
+			// Get list of stations
+			s = "SELECT DISTINCT origin FROM Schedule UNION DISTINCT SELECT DISTINCT destination FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { alStation.add(rs.getString(1)); }
+			request.setAttribute("sList", alStation);
+			rs.close();
+			
+			c.close();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
 	/*
 	 * VIEWING SCHEDULE
 	 */
@@ -1089,6 +1164,12 @@ public class representativeFunctions extends HttpServlet{
 			ps.setString(13, note);
 			ps.setString(14, ticket);
 			ps.setString(15, seat);
+			
+			ps.executeUpdate();
+			
+			String s = "UPDATE Schedule SET avaliableSeats = avaliableSeats - 1 WHERE train = ?";
+			ps = c.prepareStatement(s);
+			ps.setInt(1, rt.getTrain());
 			
 			ps.executeUpdate();
 			
