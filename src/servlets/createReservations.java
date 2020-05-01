@@ -60,7 +60,6 @@ public class createReservations extends HttpServlet {
 	    
     	ArrayList<Train> trains = (ArrayList<Train>) session.getAttribute("availableTrainsSession");
 
-	    
 	    if(request.getParameter("reserve") != null) {
 	    	String trainNumber = request.getParameter("trainNumber");
 	    	if(trainNumber != null && !trainNumber.isEmpty()) {

@@ -13,7 +13,7 @@
 		<h2>Select Origin</h2>
 		<select name="origin">
 			<option disabled selected value="0">-- Choose Origin --</option>
-			<c:forEach var="x" items="${stations}">
+			<c:forEach var="x" items="${pOrigins}">
 				<option><c:out value="${x}" /></option>
 			</c:forEach>
 		</select>
@@ -21,7 +21,7 @@
 		<h2>Select Destination</h2>
 		<select name="destination">
 			<option disabled selected value="0">-- Choose Destination --</option>
-			<c:forEach var="x" items="${stations}">
+			<c:forEach var="x" items="${pDestinations}">
 				<option><c:out value="${x}" /></option>
 			</c:forEach>
 		</select>

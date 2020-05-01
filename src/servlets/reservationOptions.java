@@ -63,25 +63,43 @@ public class reservationOptions extends HttpServlet {
 		request.setAttribute("optionsMessage", optionsMessage);
 		HttpSession session = request.getSession();  
 
-		String action = "SELECT * FROM RailwayBookingSystem.Station";
-		ArrayList<String> possibleStations = new ArrayList<>();
-
+		String action = "";
+		ArrayList<String> possibleOrigins = new ArrayList<>();
+		ArrayList<String> possibleDestinations = new ArrayList<>();
 		try {
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 			Statement stmt = con.createStatement();
-			ResultSet stationsQuery = stmt.executeQuery(action);
+			
+			action = "SELECT DISTINCT origin FROM RailwayBookingSystem.Schedule";
+			ResultSet scheduleQuery = stmt.executeQuery(action);
 
-			while (stationsQuery.next()) possibleStations.add(stationsQuery.getString("city"));
-			if (stationsQuery != null) { stationsQuery.close(); }
-			if (stmt != null) { stmt.close(); }
-			if(con != null) { con.close(); }
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+			while (scheduleQuery.next()) possibleOrigins.add(scheduleQuery.getString("origin"));
+			
+			if(scheduleQuery != null) scheduleQuery.close();				
+			if(stmt != null) stmt.close();
+			if(con != null) con.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
 		
-		request.setAttribute("stations", possibleStations);
+		try {
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+			Statement stmt = con.createStatement();
+			
+			action = "SELECT DISTINCT destination FROM RailwayBookingSystem.Schedule";
+			ResultSet scheduleQuery = stmt.executeQuery(action);
+
+			while (scheduleQuery.next()) possibleDestinations.add(scheduleQuery.getString("destination"));
+			if(scheduleQuery != null) scheduleQuery.close();				
+			if(stmt != null) stmt.close();
+			if(con != null) con.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
+			
+		
+		request.setAttribute("pOrigins", possibleOrigins);
+		request.setAttribute("pDestinations", possibleDestinations);
 
 		if (request.getParameter("Reservations Options") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservationOptions.jsp");
@@ -89,84 +107,45 @@ public class reservationOptions extends HttpServlet {
 		} else if (request.getParameter("submitOptions") != null) {
 			String selectedOrigin = request.getParameter("origin");
 			String selectedDestination = request.getParameter("destination");
-
+			SimpleDateFormat format =  new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+			
 			if (selectedOrigin != null && selectedDestination != null && !selectedOrigin.isEmpty() && !selectedDestination.isEmpty()) {
-				ArrayList<Stop> possibleLines = new ArrayList<>();
-				possibleLines = getTransitLine(selectedOrigin, selectedDestination);
-				
-				if (possibleLines.size() > 0) {
-					System.out.println("Sucess: Found Transit Lines");
-					ArrayList<Train> possibleTrains = new ArrayList<>();
+				ArrayList<Train> possibleTrains = new ArrayList<>();
+				try {
+					String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+					Class.forName("com.mysql.jdbc.Driver");
+					Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+					Statement stmt = con.createStatement();
 					
-					for(int i = 0; i < possibleLines.size(); i++) {
-						String line = possibleLines.get(i).getLine();
-						int oid = possibleLines.get(i).getStation1();
-						int did = possibleLines.get(i).getStation2();
-						double fare = possibleLines.get(i).getFare();
-						int minTravel = possibleLines.get(i).getMinTravel();
-						int numStops = possibleLines.get(i).getNumStops();
+					action = "SELECT * FROM RailwayBookingSystem.Schedule WHERE origin=\"" + selectedOrigin + "\" AND destination=\"" + selectedDestination + "\";";
+					ResultSet query = stmt.executeQuery(action);
+					
+					while(query.next()) {
+						int trainNum = query.getInt("train");
+						String line = query.getString("transitLine");
+						int availableSeats = query.getInt("avaliableSeats");
+						String departure = format.format(query.getTimestamp("departureDatetime"));
+						String arrival = format.format(query.getTimestamp("arrivalDatetime"));
+						double fare = query.getDouble("fare");
+						int numStops = query.getInt("stops");
 						
-						action = "SELECT * FROM RailwayBookingSystem.Schedule WHERE transitLine=\"" + line + "\";";	
-						try {
-							String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-							Class.forName("com.mysql.jdbc.Driver");
-							Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
-							Statement stmt = con.createStatement();
-							ResultSet trainQuery = stmt.executeQuery(action);
-
-							
-							while(trainQuery.next()) {
-								SimpleDateFormat format =  new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
-								int trainNum = trainQuery.getInt("train");
-								int availableSeats = trainQuery.getInt("avaliableSeats");
-								//int availableSeats = trainQuery.getInt("availableSeats");
-								String departure;
-								String arrival;
-								
-								//Available Seats Cases
-								if(availableSeats <= 0) continue;
-								
-								//Travel Time Cases
-								int trainOrigin = getStationId(trainQuery.getString("origin")); //obtain the origin of the train
-								int travelTime = getMinTravel(line, trainOrigin, oid);
-								int travelTime2 = getMinTravel(line, trainOrigin, did);
-								
-								if(travelTime == -1 || travelTime2 == -1) continue;
-								if (travelTime2 <= travelTime) continue;
-								
-								//Departure & Arrival Time Conversions
-								Timestamp departureDatetime = trainQuery.getTimestamp("departureDatetime");
-								
-								Timestamp departureTime = new Timestamp(departureDatetime.getTime() + TimeUnit.MINUTES.toMillis(travelTime));
-								Timestamp arrivalTime = new Timestamp(departureTime.getTime() + TimeUnit.MINUTES.toMillis(minTravel));
-								
-								departure = format.format(departureTime);
-								arrival = format.format(arrivalTime);
-								
-								possibleTrains.add(new Train(trainNum, line, selectedOrigin, oid, selectedDestination, did, availableSeats, departure, arrival, fare, minTravel, numStops));
-							}
-							if (trainQuery != null) { trainQuery.close(); }
-							if (stmt != null) { stmt.close(); }
-							if(con != null) { con.close(); }	
-						} catch (Exception ex) { ex.printStackTrace(); }	
-					}
-					if(possibleTrains.size() > 0) {
-						System.out.println("Sucess: Found Trains");
+						if(availableSeats <= 0) continue;
 						
-						request.setAttribute("availableTrainsRequest", possibleTrains);
-						session.setAttribute("availableTrainsSession", possibleTrains);
-						RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");
-						dispatcher.forward(request, response);
-					} else {
-						System.out.println("Failure: Trains Not Found");
-						optionsMessage = "There Are No Trains Available For These Stops";
-						request.setAttribute("optionsMessage", optionsMessage);
-						RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservationOptions.jsp");
-						dispatcher.forward(request, response);
+						possibleTrains.add(new Train(trainNum, line, selectedOrigin, selectedDestination, availableSeats, departure, arrival, fare, numStops));
 					}
+					
+					if(query != null) query.close();				
+					if(stmt != null) stmt.close();
+					if(con != null) con.close();
+				} catch (Exception ex) { ex.printStackTrace(); }							
+				if(possibleTrains.size() > 0) {
+					request.setAttribute("availableTrainsRequest", possibleTrains);
+					session.setAttribute("availableTrainsSession", possibleTrains);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");
+					dispatcher.forward(request, response);
 				} else {
-					System.out.println("Failure: Transit Lines Not Found");
-					optionsMessage = "There Are No Transit Lines Available For These Stops";
+					System.out.println("Failure: Trains Not Found");
+					optionsMessage = "There Are No Trains Available For These Stops";
 					request.setAttribute("optionsMessage", optionsMessage);
 					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/reservationOptions.jsp");
 					dispatcher.forward(request, response);
@@ -178,92 +157,5 @@ public class reservationOptions extends HttpServlet {
 				dispatcher.forward(request, response);
 			}
 		}
-	}
-
-	public int getMinTravel(String line, int station1, int station2) {
-		int result = -1;
-		if(station1 == station2) return 0;
-		String action = "SELECT minTravel FROM RailwayBookingSystem.Stop WHERE transitLine=\"" + line + "\" AND station1=" + station1 + " AND station2=" + station2 + ";";
-		String backup = "SELECT minTravel FROM RailwayBookingSystem.Stop WHERE transitLine=\"" + line + "\" AND station1=" + station2 + " AND station2=" + station1 + ";";
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
-			Statement stmt = con.createStatement();
-			ResultSet query = stmt.executeQuery(action);
-			ResultSet query2 = stmt.executeQuery(backup);
-			
-			while(query.next()) result = query.getInt("minTravel");		
-			if(result == -1) {
-				while(query2.next()) result = query2.getInt("minTravel");
-			}
-			if (query != null) { query.close(); }
-			if (query2 != null) { query2.close(); }
-			if (stmt != null) { stmt.close(); }
-			if(con != null) { con.close(); }
-		} catch (Exception ex) { ex.printStackTrace(); }
-		return result;
-	}
-	
-	public int getStationId(String station) {
-		int id = -1;
-		String action = "SELECT idStation FROM Station WHERE city=\"" + station + "\";";
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
-			Statement stmt = con.createStatement();
-			ResultSet query = stmt.executeQuery(action);
-			while(query.next()) id = query.getInt("idStation"); 
-			if (query != null) { query.close(); }
-			if (stmt != null) { stmt.close(); }
-			if(con != null) { con.close(); }
-		} catch (Exception ex) { ex.printStackTrace(); }
-		return id;
-	}
-	
-	public ArrayList<Stop> getTransitLine(String origin, String destination) {
-		ArrayList<Stop> result = new ArrayList<>();
-		
-		int oid = getStationId(origin);
-		int did = getStationId(destination);
-			
-		if(oid == did || oid == -1 || did == -1) {
-			return result;
-		} else {
-			String action = "SELECT * FROM Stop WHERE station1=" + oid + " AND station2=" + did + ";";
-			String action2 = "SELECT * FROM Stop WHERE station1=" + did + " AND station2=" + oid + ";";
-			boolean check = false;
-			try {
-				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-				Class.forName("com.mysql.jdbc.Driver");
-				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
-				Statement stmt = con.createStatement();
-				ResultSet query = stmt.executeQuery(action);
-				ResultSet query2 = stmt.executeQuery(action2);
-				while(query.next()) {
-					String line = query.getString("transitLine");
-					double fare = query.getDouble("fare");
-					int numStop = query.getInt("numStop");
-					int minTravel = query.getInt("minTravel");
-					result.add(new Stop(line, oid, did, fare, numStop, minTravel));
-					check = true;
-				}
-				if (check == false) {
-					while(query2.next()) {
-						String line = query2.getString("transitLine");
-						double fare = query2.getDouble("fare");
-						int numStop = query2.getInt("numStop");
-						int minTravel = query2.getInt("minTravel");
-						result.add(new Stop(line, oid, did, fare, numStop, minTravel));
-					}
-				}
-				if (query != null) { query.close(); }
-				if (query2 != null) { query2.close(); }
-				if (stmt != null) { stmt.close(); }
-				if(con != null) { con.close(); }
-			} catch (Exception ex) { ex.printStackTrace(); }
-		}
-		return result;
 	}
 }
