@@ -13,7 +13,7 @@
         	var="myDS"
         	driver="com.mysql.jdbc.Driver"
         	url="jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem?zeroDateTimeBehavior=convertToNull"
-        	user="admin" password="dbgroup20"
+        	user="admin" password="rutgerscs336"
     	/>
 		
 		<sql:query var="listSchedules" dataSource="${myDS}">

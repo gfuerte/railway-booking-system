@@ -101,8 +101,7 @@ public class representativeFunctions extends HttpServlet{
 		}
 		
 	}
-	
-	
+
 	/*
 	 * ADDING SCHEDULE
 	 * Gets data for drop down lists - transit lines, origins, available trains, times (15 minute intervals)
@@ -134,6 +133,7 @@ public class representativeFunctions extends HttpServlet{
 			rs1 = ps.executeQuery();
 			while(rs1.next()) { alTransitLines.add(rs1.getString(1)); }
 			request.setAttribute("transitLineList", alTransitLines);
+			rs1.close();
 
 			// Get list of origins
 			s = "(SELECT name FROM Station WHERE idStation IN (SELECT station1 FROM Route)) UNION DISTINCT (SELECT name FROM Station WHERE idStation IN (SELECT station2 FROM Route))";
@@ -141,6 +141,7 @@ public class representativeFunctions extends HttpServlet{
 			rs2 = ps.executeQuery();
 			while(rs2.next()) { alOrigins.add(rs2.getString(1)); }
 			request.setAttribute("originList", alOrigins);
+			rs2.close();
 
 			// Get list of available trains
 			s = "SELECT idTrain FROM Train WHERE idTrain NOT IN (SELECT train FROM Schedule)";
@@ -148,6 +149,7 @@ public class representativeFunctions extends HttpServlet{
 			rs3 = ps.executeQuery();
 			while(rs3.next()) { alTrains.add(rs3.getInt(1)); }
 			request.setAttribute("trainList", alTrains);
+			rs3.close();
 			
 			// Make list of times in 15 minute intervals
 			DateFormat df = new SimpleDateFormat("HH:mm");
@@ -207,6 +209,7 @@ public class representativeFunctions extends HttpServlet{
 			ResultSet orig = ps.executeQuery();
 			int o = 0;
 			while (orig.next()) { o = orig.getInt(1); }
+			orig.close();
 			
 			int train = Integer.parseInt(request.getParameter("selectTrain")); 
 			Date date = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("selectDate"));
@@ -223,6 +226,7 @@ public class representativeFunctions extends HttpServlet{
 				po1 = possibleOrigins.getInt(1);
 				po2 = possibleOrigins.getInt(2);
 			}
+			possibleOrigins.close();
 			PreparedStatement ps1 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po1);
 			PreparedStatement ps2 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po2);
 			ResultSet rs1 = ps1.executeQuery();
@@ -232,6 +236,8 @@ public class representativeFunctions extends HttpServlet{
 				porig1 = rs1.getString(1);
 				porig2 = rs2.getString(1);
 			}
+			rs1.close();
+			rs2.close();
 
 			// Check that selected origin is part of transit line
 			if (po1 != o && po2 != o) {
@@ -249,6 +255,7 @@ public class representativeFunctions extends HttpServlet{
 			ResultSet ns = ps.executeQuery();
 			int seats = 0;
 			while(ns.next()) { seats = ns.getInt(1); }
+			ns.close();
 			
 			// Get all stops in selected transit line
 			s = "SELECT t1.transitLine, Station.name station1, t1.station2, t1.fare, t1.numStop, t1.minTravel, t1.station1 idStation1, t1.idStation2 FROM (SELECT Stop.transitLine, Stop.station1, Station.name station2, Stop.fare, Stop.numStop, Stop.minTravel, Stop.Station2 idStation2 FROM Stop JOIN Station ON Stop.station2=Station.idStation WHERE Stop.transitLine = ?) t1 JOIN Station ON Station.idStation=t1.station1";
@@ -315,6 +322,7 @@ public class representativeFunctions extends HttpServlet{
 			
 				ps.executeUpdate();
 			}
+			rs.close();
 			
 		} catch (Exception e) {	
 			e.printStackTrace();
@@ -350,6 +358,7 @@ public class representativeFunctions extends HttpServlet{
 			rs1 = ps.executeQuery();
 			while(rs1.next()) { alTransitLines.add(rs1.getString(1)); }
 			request.setAttribute("transitLineList", alTransitLines);
+			rs1.close();
 
 			// Get list of available trains
 			s = "SELECT DISTINCT train FROM Schedule";
@@ -357,6 +366,7 @@ public class representativeFunctions extends HttpServlet{
 			rs2 = ps.executeQuery();
 			while(rs2.next()) { alTrains.add(rs2.getInt(1)); }
 			request.setAttribute("trainList", alTrains);
+			rs2.close();
 			
 		} catch (Exception e) {	
 			e.printStackTrace();

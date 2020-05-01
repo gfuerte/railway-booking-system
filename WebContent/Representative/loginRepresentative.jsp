@@ -39,7 +39,7 @@ form {
 	<input type ="submit" name = "viewSchedulesR" value = "View Train Schedules">
 	</form>
 
-	<br><br>
+	<br><br><br>
 
 	<form method="get" action="${pageContext.request.contextPath}/redirect">
 	<input type="submit" name = "logoutButton" value="Logout">
