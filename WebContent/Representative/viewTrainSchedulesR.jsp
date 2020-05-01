@@ -38,19 +38,7 @@
 			</form>
     		
     	<br><br>
-    		
-    	<sql:setDataSource
-        	var="myDS"
-        	driver="com.mysql.jdbc.Driver"
-        	url="jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem?zeroDateTimeBehavior=convertToNull"
-        	user="admin" password="rutgerscs336"
-    	/>
-		
-		<sql:query var="listSchedules" dataSource="${myDS}">
-			SELECT * FROM Schedule;
-    	</sql:query>
-    		
-    		
+ 
     		<table border="1">
             	<tr>
                		<th>Origin</th>
@@ -64,18 +52,18 @@
             		<th>Fare</th>
             		<th>Train Number</th>
             	</tr>
-            	<c:forEach var="schedule" items="${listSchedules.rows}">
+            	<c:forEach var="stop" items="${scheduleList}">
                 <tr>
-                    <td><c:out value="${schedule.origin}" /></td>
-                    <td><c:out value="${schedule.destination}" /></td>
-                    <td><c:out value="${schedule.transitLine}" /></td>
-                    <td><c:out value="${schedule.avaliableSeats}" /></td>
-                    <td><c:out value="${schedule.stops}" /></td>
-                    <td><c:out value="${schedule.departureDatetime}" /></td>
-                    <td><c:out value="${schedule.arrivalDatetime}" /></td>
-					<td><c:out value="${schedule.travelTime}" /></td>
-                    <td><c:out value="${schedule.fare}" /></td>
-                    <td><c:out value="${schedule.train}" /></td>
+                    <td><c:out value="${stop.getOrigin()}" /></td>
+                    <td><c:out value="${stop.getDestination()}" /></td>
+                    <td><c:out value="${stop.getTransitLine()}" /></td>
+                    <td><c:out value="${stop.getSeats()}" /></td>
+                    <td><c:out value="${stop.getStops()}" /></td>
+                    <td><c:out value="${stop.getDepartureTime()}" /></td>
+                    <td><c:out value="${stop.getArrivalTime()}" /></td>
+					<td><c:out value="${stop.getTravelTime()}" /></td>
+                    <td><c:out value="${stop.getFare()}" /></td>
+                    <td><c:out value="${stop.getTrain()}" /></td>
 					
                 </tr>
             	</c:forEach>

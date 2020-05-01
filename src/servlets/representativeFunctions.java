@@ -19,6 +19,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import POJOs.ReservationR;
+import POJOs.Stop;
+import POJOs.StopR;
 
 
 /**
@@ -60,14 +65,9 @@ public class representativeFunctions extends HttpServlet{
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-		// View Reservations
-		if(request.getParameter("viewReservationsR") != null) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
-			dispatcher.forward(request, response);
-		}
-		
 		// View Train Schedules
 		if(request.getParameter("viewSchedulesR") != null) {
+			getScheduleView(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -90,7 +90,7 @@ public class representativeFunctions extends HttpServlet{
 		if (request.getParameter("deleteScheduleR") != null) {			
 			getDeleteScheduleOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/deleteTrainSchedulesR.jsp");
-			dispatcher.include(request, response);
+			dispatcher.forward(request, response);
 		}
 		
 		// Confirm Deleting Schedule
@@ -104,7 +104,7 @@ public class representativeFunctions extends HttpServlet{
 		if (request.getParameter("editScheduleR") != null) {			
 			getEditScheduleOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
-			dispatcher.include(request, response);
+			dispatcher.forward(request, response);
 		}
 		
 		// Confirm Editing Schedule
@@ -114,8 +114,52 @@ public class representativeFunctions extends HttpServlet{
 			dispatcher.include(request, response);
 		}
 		
+		// View Reservations
+		if(request.getParameter("viewReservationsR") != null) {
+			getReservationOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		// Delete Reservation
+		if(request.getParameter("deleteReservationR") != null) {
+			deleteReservation(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
+			dispatcher.include(request, response);
+		}
+		
+		// Edit Reservation Menu
+		if(request.getParameter("editReservationR") != null) {
+			getEditReservationOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editReservation.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		// Confirm Editing Reservation
+		if(request.getParameter("editReservation") != null) {
+			confirmEditReservation(request, response);
+			getEditReservationOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
+			dispatcher.include(request, response);
+		}
+		
+		
 	}
 
+	/*
+	 * VIEWING SCHEDULE
+	 */
+	private void getScheduleView(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			ArrayList<StopR> al = getStops(request, response);
+			request.setAttribute("scheduleList", al);
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/*
 	 * ADDING SCHEDULE
 	 * Gets data for drop down lists - transit lines, origins, available trains, times (15 minute intervals)
@@ -552,8 +596,8 @@ public class representativeFunctions extends HttpServlet{
 			// Check for negative numbers
 			if ((!minDelay.equals("") && Integer.parseInt(minDelay) < 0) ||
 				(!minEarly.equals("") && Integer.parseInt(minEarly) < 0) ||
-				(!discountPrice.equals("") && Integer.parseInt(discountPrice) < 0) ||
-				(!raisedPrice.equals("") && Integer.parseInt(raisedPrice) < 0)) {
+				(!discountPrice.equals("") && Double.parseDouble(discountPrice) < 0) ||
+				(!raisedPrice.equals("") && Double.parseDouble(raisedPrice) < 0)) {
 					String m = "Entries cannot be negative. Please enter positive values.";
 					request.setAttribute("message", m);
 					getEditScheduleOptions(request, response);
@@ -594,10 +638,10 @@ public class representativeFunctions extends HttpServlet{
 			
 			// Discount or raise ticket prices for a train
 			if (!discountPrice.equals("") || !raisedPrice.equals("")) {
-				int delP = (!discountPrice.equals("")) ? Integer.parseInt(discountPrice)*-1 : Integer.parseInt(raisedPrice);
+				double delP = (!discountPrice.equals("")) ? Double.parseDouble(discountPrice)*-1 : Double.parseDouble(raisedPrice);
 				s = "UPDATE Schedule SET fare = fare + ? WHERE train = ?";
 				ps = c.prepareStatement(s);
-				ps.setInt(1, delP);
+				ps.setDouble(1, delP);
 				ps.setInt(2, train);
 				ps.executeUpdate();
 			}
@@ -639,8 +683,323 @@ public class representativeFunctions extends HttpServlet{
 		
 	}
 
+	/*
+	 * VIEW RESERVATIONS
+	 * Get a drop down list of all reservations
+	 */
+	private void getReservationOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			
+			ArrayList<ReservationR> ar = getReservations(request, response);
+			request.setAttribute("allReservation", ar);
+			
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs = null;
+			ArrayList<String> al = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT rid FROM Reservations";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { al.add(rs.getString(1)); }
+			request.setAttribute("resList", al);
+			rs.close();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+	}
 	
+	/*
+	 * DELETING RESERVATION
+	 * Delete selected reservation from dropdown list on View Reservation Menu
+	 */
+	private void deleteReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+			
+			// Get user input
+			String prid = request.getParameter("selectRes");
+			
+			// Check to see if rid field is valid
+			if (prid == null) {
+				String m = "No reservation selected. Please select an rid.";
+				request.setAttribute("message", m);
+				getReservationOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
+				dispatcher.forward(request, response);
+				return;				
+			}
+			
+			// Delete selected reservation
+			s = "DELETE FROM Reservations WHERE rid = ?";
+			ps = c.prepareStatement(s);
+			ps.setInt(1, Integer.parseInt(prid));
+			ps.executeUpdate();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+	}
 	
+	/*
+	 * EDITING RESERVATION
+	 * Move to edit reservation menu - can edit fee, class, and seat
+	 */
+	private void getEditReservationOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs = null;
+			ArrayList<String> al = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT rid FROM Reservations";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { al.add(rs.getString(1)); }
+			request.setAttribute("resList", al);
+			rs.close();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+	
+	}
+	
+	/*
+	 * EDITING RESERVATION
+	 * Edits reservation if no errors
+	 */
+	private void confirmEditReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Get user inputs
+			String prid = request.getParameter("selectRes");
+			String pFee = request.getParameter("fee");
+			String tclass = request.getParameter("selectClass");
+			String seat = request.getParameter("seat");
+			
+			// Check if user selected a reservation to edit
+			if (prid == null) {
+				String m = "Must select reservation to edit. Please select one.";
+				request.setAttribute("message", m);
+				getEditReservationOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editReservation.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			int rid = Integer.parseInt(prid);
+			
+			// Check for negative numbers
+			if ((!pFee.equals("") && Double.parseDouble(pFee) < 0)) {
+					String m = "We like money. Fee cannot be negative. Please enter positive values.";
+					request.setAttribute("message", m);
+					getEditReservationOptions(request, response);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editReservation.jsp");
+					dispatcher.forward(request, response);
+					return;
+			}
+			
+			// Let user know they didn't select anything
+			if (pFee.equals("") && tclass == null && seat.equals("")) {
+				String m = "No edits were selected. Please select an edit or return to view reservations.";
+				request.setAttribute("message", m);
+				getEditReservationOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editReservation.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
+			// Update fee
+			if (!pFee.equals("")) {
+				double fee = Double.parseDouble(pFee);
+				// Update schedule with delayed/early train
+				s = "UPDATE Reservations SET fee = ? WHERE rid = ?";
+				ps = c.prepareStatement(s);
+				ps.setDouble(1, fee);
+				ps.setInt(2, rid);
+				ps.executeUpdate();
+			}
+			
+			// Update class
+			if (tclass != null) {
+				s = "UPDATE Reservations SET class = ? WHERE rid = ?";
+				ps = c.prepareStatement(s);
+				ps.setString(1, tclass);
+				ps.setInt(2, rid);
+				ps.executeUpdate();
+			}
+			
+			// Update seat number
+			if (!seat.equals("")) {
+				s = "UPDATE Reservations SET seat = ? WHERE rid = ?";
+				ps = c.prepareStatement(s);
+				ps.setString(1, seat);
+				ps.setInt(2, rid);
+				ps.executeUpdate();
+			}
+			
+			// Update representative
+			s = "UPDATE Reservations SET repUsername = ? WHERE rid = ?";
+			ps = c.prepareStatement(s);
+			ps.setString(1, request.getSession().getAttribute("Name").toString());
+			ps.setInt(2, rid);
+			ps.executeUpdate();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/*
+	 * Make an arraylist of stops to display
+	 */
+	private ArrayList<StopR> getStops(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		SimpleDateFormat dtf =  new SimpleDateFormat ("yyyy-MM-dd hh:mm");
+		SimpleDateFormat tf =  new SimpleDateFormat ("hh:mm");
+				
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs = null;
+			ArrayList<StopR> al = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT * FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				String origin = rs.getString(1);
+				String destination = rs.getString(2);
+				String transitLine = rs.getString(3);
+				int seats = rs.getInt(4);
+				int stops = rs.getInt(5);
+				String deptTime = dtf.format(rs.getTimestamp(6));
+				String arrvTime = dtf.format(rs.getTimestamp(7));				
+				String trvlTime = tf.format(rs.getTimestamp(8));
+				double fare = Math.round(rs.getDouble(9)*100)/100;
+				int train = rs.getInt(10);
+				al.add(new StopR(origin, destination, transitLine, seats, stops, deptTime, arrvTime, trvlTime, fare, train));
+			}
+			
+			request.setAttribute("resList", al);
+			rs.close();
+			
+			return al;
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
+	
+	/*
+	 * Make an arraylist of reservations to display
+	 */
+	private ArrayList<ReservationR> getReservations(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		SimpleDateFormat dtf =  new SimpleDateFormat ("yyyy-MM-dd hh:mm");
+		SimpleDateFormat tf =  new SimpleDateFormat ("hh:mm");
+				
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs = null;
+			ArrayList<ReservationR> al = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT * FROM Reservations";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				int rid = rs.getInt(1);
+				double fee = Math.round(rs.getDouble(2)*100)/100;
+				String date = dtf.format(rs.getTimestamp(3));
+				int train = rs.getInt(4);
+				String transitLine = rs.getString(5);
+				String origin = rs.getString(6);
+				String destination = rs.getString(7);
+				String deptTime = dtf.format(rs.getTimestamp(8));
+				String arrvTime = dtf.format(rs.getTimestamp(9));
+				String customer = rs.getString(10);
+				String representative = rs.getString(11);
+				String tclass = rs.getString(12);
+				String note = rs.getString(13);
+				String ticketType = rs.getString(14);
+				String seat = rs.getString(15);
+				
+				al.add(new ReservationR(rid, fee, date, train, transitLine, origin, destination, deptTime, arrvTime, customer, representative, tclass, note, ticketType, seat));
+			}
+			
+			request.setAttribute("resList", al);
+			rs.close();
+			
+			return al;
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
 	/*
 	 * Combine date and time into one
 	 */
