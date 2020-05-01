@@ -136,13 +136,13 @@ public class search extends HttpServlet {
 				
 			
 			
-			if (request.getParameter("sortdeparture") != null || request.getParameter("showStops") != null) {
-				
-				query += " ORDER BY departureDatetime";
-				
-			} else if (request.getParameter("sortarrival") != null) {
+			if (request.getParameter("sortarrival") != null || request.getParameter("showStops") != null) {
 				
 				query += " ORDER BY arrivalDatetime";
+				
+			} else if (request.getParameter("sortdeparture") != null ) {
+				
+				query += " ORDER BY departureDatetime";
 				
 			} else if (request.getParameter("sortorigin") != null) {
 				
