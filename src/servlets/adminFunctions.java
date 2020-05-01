@@ -1,12 +1,7 @@
 package servlets;
 
-import java.io.*;
-import java.util.*;
 import java.sql.*;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 
-import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
@@ -14,7 +9,6 @@ import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 
 /**
  * Servlet implementation class adminFunctions
@@ -128,7 +122,7 @@ public class adminFunctions extends HttpServlet{
 				if(request.getParameter("addCustomer") != null) {
 					//Create a SQL statement
 					
-					Statement stmt = con.createStatement();
+//					Statement stmt = con.createStatement();
 					
 					//Get HTML Params
 					String user = request.getParameter("username");
@@ -161,7 +155,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 					}
 					
-					HttpSession session=request.getSession(); 
+//					HttpSession session=request.getSession(); 
 					//check if empty result set
 					if (!result.isBeforeFirst() ) { 
 						//if empty insert into login table and customer table
@@ -205,7 +199,7 @@ public class adminFunctions extends HttpServlet{
 				if(request.getParameter("addEmployee") != null) {
 	
 					//Create a SQL statement
-					Statement stmt = con.createStatement();
+//					Statement stmt = con.createStatement();
 					
 					//Get HTML Params
 					String user = request.getParameter("username");
@@ -233,7 +227,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 					}
 					
-					HttpSession session=request.getSession(); 
+//					HttpSession session=request.getSession(); 
 					//check if empty result set
 					if (!result.isBeforeFirst() ) { 
 						//if empty insert into login table and customer table
@@ -323,7 +317,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 	
 						
-						HttpSession session=request.getSession(); 
+//						HttpSession session=request.getSession(); 
 						//check if empty result set
 						if (!result.isBeforeFirst() ) { 
 							String message = "Customer does not exist in the system.";
@@ -346,7 +340,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 	
 						
-						HttpSession session=request.getSession(); 
+//						HttpSession session=request.getSession(); 
 						//check if empty result set
 						if (!result.isBeforeFirst() ) { 
 							search = "UPDATE RailwayBookingSystem.Login SET username = ? WHERE username = ?" ;
@@ -510,7 +504,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 	
 						
-						HttpSession session=request.getSession(); 
+//						HttpSession session=request.getSession(); 
 						//check if empty result set
 						if (!result.isBeforeFirst() ) { 
 							String message = "Customer representative does not exist in the system.";
@@ -533,7 +527,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 	
 						
-						HttpSession session=request.getSession(); 
+//						HttpSession session=request.getSession(); 
 						//check if empty result set
 						if (!result.isBeforeFirst() ) { 
 							search = "UPDATE RailwayBookingSystem.Login SET username = ? WHERE username = ?" ;
@@ -632,7 +626,7 @@ public class adminFunctions extends HttpServlet{
 						result = ps.executeQuery();
 	
 						
-						HttpSession session=request.getSession(); 
+//						HttpSession session=request.getSession(); 
 						//check if empty result set
 						if (!result.isBeforeFirst() ) { 
 							String message = "User does not exist in the system.";

@@ -8,7 +8,7 @@
     	int count = 0;
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-        Connection conn = DriverManager.getConnection(url,"admin","dbgroup20");
+        Connection conn = DriverManager.getConnection(url,"admin","rutgerscs336");
         Statement statement=conn.createStatement();
         String query = "SELECT transitLine, COUNT(*) num FROM Reservations GROUP BY transitLine ORDER BY num DESC";
         
