@@ -118,7 +118,6 @@ public class reservationOptions extends HttpServlet {
 					Statement stmt = con.createStatement();
 					
 					action = "SELECT * FROM RailwayBookingSystem.Schedule WHERE origin=\"" + selectedOrigin + "\" AND destination=\"" + selectedDestination + "\";";
-					System.out.println(action);
 					ResultSet query = stmt.executeQuery(action);
 					
 					while(query.next()) {
@@ -138,11 +137,8 @@ public class reservationOptions extends HttpServlet {
 					if(query != null) query.close();				
 					if(stmt != null) stmt.close();
 					if(con != null) con.close();
-				} catch (Exception ex) { ex.printStackTrace(); }
-									
+				} catch (Exception ex) { ex.printStackTrace(); }							
 				if(possibleTrains.size() > 0) {
-					System.out.println("Sucess: Found Trains");
-						
 					request.setAttribute("availableTrainsRequest", possibleTrains);
 					session.setAttribute("availableTrainsSession", possibleTrains);
 					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/createReservations.jsp");

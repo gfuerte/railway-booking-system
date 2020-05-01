@@ -144,7 +144,6 @@ public class finalizeReservation extends HttpServlet {
 					Statement stmt = con.createStatement();
 					
 	    			String action = "SELECT * FROM RailwayBookingSystem.Train WHERE idTrain=" + trainNum + ";";
-	    			System.out.println(action);
 	    			ResultSet trainQuery = stmt.executeQuery(action);
 		    
 	    			int numSeats = -1;
@@ -152,7 +151,6 @@ public class finalizeReservation extends HttpServlet {
 	    			trainQuery.close();
 	    			
 	    			action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + " AND origin=\"" + origin + "\" AND destination=\"" + destination + "\";";
-	    			System.out.println(action);
 		    		ResultSet scheduleQuery = stmt.executeQuery(action);
 		    		
 	    			int availableSeats = -1;
@@ -233,7 +231,6 @@ public class finalizeReservation extends HttpServlet {
 		    			insertPS.setString(14, seat);
 		    			
 		    			
-		    			System.out.println(insertPS);
 		    			insertPS.executeUpdate();
 		    			if(insertPS != null) insertPS.close();
 						if(con1 != null) con1.close();
