@@ -42,7 +42,7 @@ form {
 	<br><br>
 	
 	<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
-	<h4>List Customer Reservations By Train Information</h4>
+	<h3>List Customer Reservations By Train Information</h3>
 	<table>
 	<tr>    
 	<td>Transit Line:</td><td><input type="text" name="transitLine"></td>
@@ -56,6 +56,34 @@ form {
 	<input type ="submit" name = "getReservationsByTrain" value = "Go">
 	<br><br>${message}
 	</form>
+	
+	<br><br>
+	
+	<h3>List Schedule By:</h3>
+	<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
+	<h4>Origin and Destination</h4>
+	<table>
+	<tr>    
+	<td>Origin:</td><td><input type="text" name="origin"></td>
+	</tr>
+	</table>
+	<table>
+	<tr>
+	<td>Destination:</td><td><input type="text" name="destination"></td>
+	</tr>
+	</table>
+	<input type ="submit" name = "getSchedule" value = "Go">
+	<br><br>${message2}
+	<br>
+	<h4>Station</h4>
+	<table>
+	<tr>    
+	<td>Station:</td><td><input type="text" name="station"></td>
+	</tr>
+	</table>
+	<input type ="submit" name = "getScheduleByStation" value = "Go">
+	</form>
+	<br><br>${message3}
 	<br><br>
 
 	<br><br><br>

@@ -71,6 +71,8 @@
 	        output = ps.executeQuery();
 	        
 	        %>
+	        <div align="center">
+            <h2>RESERVATION LISTING</h2>
             <TABLE BORDER="1">
                 <TR>
                     <TH>Reservation ID</TH>
@@ -98,6 +100,7 @@
         }
         %>
             </TABLE>
+            </div>
 	<form method="get" action="${pageContext.request.contextPath}/adminFunctions">
 		<input type="submit" name = "goBack" value="Return">
 	</form>
