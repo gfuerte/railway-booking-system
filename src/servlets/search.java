@@ -138,7 +138,7 @@ public class search extends HttpServlet {
 				
 			
 			
-			if (request.getParameter("sortarrival") != null || request.getParameter("showStops") != null) {
+			if (request.getParameter("sortarrival") != null) {
 				
 				query += " ORDER BY arrivalDatetime";
 				
@@ -186,7 +186,6 @@ public class search extends HttpServlet {
 	    	request.setAttribute("list", trains);
 	    	request.setAttribute("slist", nums);	
 			
-//	    	System.out.println(query);
 	    	
 		} catch (Exception ex) {
 			ex.printStackTrace();
