@@ -162,6 +162,32 @@ public class representativeFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/listOfCustomerSeats.jsp");
 			dispatcher.forward(request, response);
 		}
+
+		if(request.getParameter("getSchedule") != null) {
+			if(request.getParameter("origin").isEmpty() || request.getParameter("destination").isEmpty()) {
+				String message = "Please fill out both fields.";
+			    request.setAttribute("message2", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/loginRepresentative.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/scheduleList.jsp");
+			dispatcher.forward(request, response);
+		}
+		
+		if(request.getParameter("getScheduleByStation") != null) {
+			if(request.getParameter("station").isEmpty()) {
+				String message = "Please fill out station field.";
+			    request.setAttribute("message3", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/loginRepresentative.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/scheduleList.jsp");
+			dispatcher.forward(request, response);
+		}
 		
 		
 	}
