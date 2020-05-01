@@ -113,7 +113,7 @@ public class representativeFunctions extends HttpServlet{
 			// Connect to SQL database
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 			// Query to execute
 			String s = "";
@@ -178,7 +178,7 @@ public class representativeFunctions extends HttpServlet{
 			// Connect to SQL database
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 			// Query to execute
 			String s = "";
@@ -332,7 +332,7 @@ public class representativeFunctions extends HttpServlet{
 			// Connect to SQL database
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 			// Query to execute
 			String s = "";
@@ -373,7 +373,7 @@ public class representativeFunctions extends HttpServlet{
 			// Connect to SQL database
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 			// Query to execute
 			String s = "";

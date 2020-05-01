@@ -60,7 +60,7 @@ public class search extends HttpServlet {
 			
 			Class.forName("com.mysql.jdbc.Driver");
 			
-			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 			
 			String date = request.getParameter("date");
 			String sorigin = request.getParameter("origin");

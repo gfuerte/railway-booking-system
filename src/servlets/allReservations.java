@@ -64,7 +64,7 @@ public class allReservations extends HttpServlet {
 	    try {
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 			Statement stmt = con.createStatement();
 			
 			ResultSet query = stmt.executeQuery("SELECT * FROM RailwayBookingSystem.Reservations");
@@ -138,7 +138,7 @@ public class allReservations extends HttpServlet {
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = DriverManager.getConnection(url, "admin",
-					"dbgroup20");
+					"rutgerscs336");
 			Statement stmt = con.createStatement();
 
 			ResultSet query = stmt.executeQuery(action);
