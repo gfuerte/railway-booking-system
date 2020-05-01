@@ -350,6 +350,14 @@ public class adminFunctions extends HttpServlet{
 							ps.setString(1, user); ps.setString(2, modification);
 							
 							ps.executeUpdate();
+							
+							search = "UPDATE RailwayBookingSystem.Reservations SET customerUsername = ? WHERE customerUsername = ?" ;
+							
+							//Create Prepared Statement
+							ps = con.prepareStatement(search);
+							ps.setString(1, user); ps.setString(2, modification);
+							
+							ps.executeUpdate();
 							modification= user;
 						}
 						else{
@@ -531,6 +539,14 @@ public class adminFunctions extends HttpServlet{
 						//check if empty result set
 						if (!result.isBeforeFirst() ) { 
 							search = "UPDATE RailwayBookingSystem.Login SET username = ? WHERE username = ?" ;
+							
+							//Create Prepared Statement
+							ps = con.prepareStatement(search);
+							ps.setString(1, user); ps.setString(2, modification);
+							
+							ps.executeUpdate();
+							
+							search = "UPDATE RailwayBookingSystem.Reservations SET repUsername = ? WHERE repUsername = ?" ;
 							
 							//Create Prepared Statement
 							ps = con.prepareStatement(search);
