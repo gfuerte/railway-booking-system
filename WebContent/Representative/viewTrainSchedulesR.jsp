@@ -8,8 +8,38 @@
         <title>Train Schedules</title>
     </head>
 
-    <body>		
-		<sql:setDataSource
+    <body>
+    
+    	<div align="center">
+    		<h2>Train Schedules</h2>
+    		
+ 	   		<table><tr>
+            	<th>
+ 	   			<form action="${pageContext.request.contextPath}/representativeFunctions" method="post">
+					<input type="submit" name="addScheduleR" value="Add Schedule">
+				</form>
+				</th>
+				<th>
+				<form action="${pageContext.request.contextPath}/representativeFunctions" method="post">
+					<input type="submit" name="editScheduleR" value="Edit Schedule">
+				</form>
+				</th>
+				<th>
+	    		<form action="${pageContext.request.contextPath}/representativeFunctions" method="post">
+					<input type="submit" name="deleteScheduleR" value="Delete Schedule">
+				</form>
+				</th>
+			</tr></table>
+    	
+    	<br>
+    	
+ 	   		<form action="${pageContext.request.contextPath}/representativeFunctions" method="get">
+				<input type="submit" name="returnToMainR" value="Exit">
+			</form>
+    		
+    	<br><br>
+    		
+    	<sql:setDataSource
         	var="myDS"
         	driver="com.mysql.jdbc.Driver"
         	url="jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem?zeroDateTimeBehavior=convertToNull"
@@ -19,9 +49,8 @@
 		<sql:query var="listSchedules" dataSource="${myDS}">
 			SELECT * FROM Schedule;
     	</sql:query>
-    
-    	<div align="center">
-    		<h2>Train Schedules</h2>
+    		
+    		
     		<table border="1">
             	<tr>
                		<th>Origin</th>
@@ -51,34 +80,6 @@
                 </tr>
             	</c:forEach>
         	</table>
-    	</div>
-    	
-    	<br><br>
-    	<div align="center">
- 	   		<table><tr>
-            	<th>
- 	   			<form action="${pageContext.request.contextPath}/representativeFunctions" method="post">
-					<input type="submit" name="addScheduleR" value="Add Schedule">
-				</form>
-				</th>
-				<th>
-				<form action="${pageContext.request.contextPath}/representativeFunctions" method="post">
-					<input type="submit" name="editScheduleR" value="Edit Schedule">
-				</form>
-				</th>
-				<th>
-	    		<form action="${pageContext.request.contextPath}/representativeFunctions" method="post">
-					<input type="submit" name="deleteScheduleR" value="Delete Schedule">
-				</form>
-				</th>
-			</tr></table>
-    	</div>
-    	
-    	<br><br>
-    	<div align="center">
- 	   		<form action="${pageContext.request.contextPath}/representativeFunctions" method="get">
-				<input type="submit" name="returnToMainR" value="Exit">
-			</form>
     	</div>
     	
     </body>

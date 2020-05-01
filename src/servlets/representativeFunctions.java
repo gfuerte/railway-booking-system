@@ -100,6 +100,20 @@ public class representativeFunctions extends HttpServlet{
 			dispatcher.include(request, response);
 		}
 		
+		// Edit Train Schedule Menu
+		if (request.getParameter("editScheduleR") != null) {			
+			getEditScheduleOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
+			dispatcher.include(request, response);
+		}
+		
+		// Confirm Editing Schedule
+		if (request.getParameter("editTrainSchedule") != null) {			
+			confirmEditSchedule(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
+			dispatcher.include(request, response);
+		}
+		
 	}
 
 	/*
@@ -397,7 +411,7 @@ public class representativeFunctions extends HttpServlet{
 			if (transitLine == null && ptrain == null) {
 				String m = "Must select either Transit Line or Train Number to delete. Please select one.";
 				request.setAttribute("message", m);
-				getAddScheduleOptions(request, response);
+				getDeleteScheduleOptions(request, response);
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/deleteTrainSchedulesR.jsp");
 				dispatcher.forward(request, response);
 				return;
@@ -407,7 +421,7 @@ public class representativeFunctions extends HttpServlet{
 			if (transitLine != null && ptrain != null) {
 				String m = "Cannot select both Transit Line or Train Number to delete. Please select one.";
 				request.setAttribute("message", m);
-				getAddScheduleOptions(request, response);
+				getDeleteScheduleOptions(request, response);
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/deleteTrainSchedulesR.jsp");
 				dispatcher.forward(request, response);
 				return;
@@ -435,6 +449,197 @@ public class representativeFunctions extends HttpServlet{
 		}
 		
 	}
+	
+	/*
+	 * EDITING SCHEDULE
+	 * Gets data from server to display
+	 */
+	private void getEditScheduleOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs1 = null;
+			ResultSet rs2 = null;
+			ArrayList<Integer> alTrains = new ArrayList<>();
+			ArrayList<Integer> alNewTrains = new ArrayList<>();
+			
+			// Get list of trains
+			s = "SELECT DISTINCT train FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs1 = ps.executeQuery();
+			while(rs1.next()) { alTrains.add(rs1.getInt(1)); }
+			request.setAttribute("trainList", alTrains);
+			rs1.close();
+
+			// Get list of available trains
+			s = "SELECT idTrain FROM Train WHERE idTrain NOT IN (SELECT train FROM Schedule)";
+			ps = c.prepareStatement(s);
+			rs2 = ps.executeQuery();
+			while(rs2.next()) { alNewTrains.add(rs2.getInt(1)); }
+			request.setAttribute("newTrainList", alNewTrains);
+			rs2.close();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/*
+	 * EDITING SCHEDULE
+	 * Edits schedule if no errors
+	 */
+	private void confirmEditSchedule(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Get user inputs
+			String pTrain = request.getParameter("selectTrain");
+			String minDelay = request.getParameter("minDelay");
+			String minEarly = request.getParameter("minEarly");
+			String discountPrice = request.getParameter("discountPrice");
+			String raisedPrice = request.getParameter("raisedPrice");
+			String pNewTrain = request.getParameter("selectNewTrain");
+			
+			// Check if user selected a train to edit
+			if (pTrain == null) {
+				String m = "Must select train to edit on schedule. Please select one.";
+				request.setAttribute("message", m);
+				getEditScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			int train = Integer.parseInt(pTrain);
+			
+			// Check to see if user chose to both delay and make train early
+			if (!minDelay.equals("") && !minEarly.equals("")) {
+				String m = "Train cannot be both delayed and early. Please select one.";
+				request.setAttribute("message", m);
+				getEditScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+
+			// Check to see if user both discounted and raised prices
+			if (!discountPrice.equals("") && !raisedPrice.equals("")) {
+				String m = "Tickets cannot be both discounted and raised. Please select one.";
+				request.setAttribute("message", m);
+				getEditScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
+			// Check for negative numbers
+			if ((!minDelay.equals("") && Integer.parseInt(minDelay) < 0) ||
+				(!minEarly.equals("") && Integer.parseInt(minEarly) < 0) ||
+				(!discountPrice.equals("") && Integer.parseInt(discountPrice) < 0) ||
+				(!raisedPrice.equals("") && Integer.parseInt(raisedPrice) < 0)) {
+					String m = "Entries cannot be negative. Please enter positive values.";
+					request.setAttribute("message", m);
+					getEditScheduleOptions(request, response);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
+					dispatcher.forward(request, response);
+					return;
+			}
+			
+			// Let user know they didn't select anything
+			if (minDelay.equals("") && minEarly.equals("") && discountPrice.equals("") && raisedPrice.equals("") && pNewTrain == null) {
+				String m = "No edits were selected. Please select an edit or return to view schedule.";
+				request.setAttribute("message", m);
+				getEditScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/editTrainSchedulesR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
+			// Mark train as delayed or early
+			if (!minDelay.equals("") || !minEarly.equals("")) {
+				// Get the minutes delayed/early
+				int delT = (!minDelay.equals("")) ? Integer.parseInt(minDelay) : Integer.parseInt(minEarly)*-1;
+				// Update schedule with delayed/early train
+				s = "UPDATE Schedule SET departureDatetime = DATE_ADD(departureDatetime, INTERVAL ? MINUTE), arrivalDatetime = DATE_ADD(arrivalDatetime, INTERVAL ? MINUTE) WHERE train = ?";
+				ps = c.prepareStatement(s);
+				ps.setInt(1, delT);
+				ps.setInt(2, delT);
+				ps.setInt(3, train);
+				ps.executeUpdate();
+				// Update schedule with delayed/early reservations
+				s = "UPDATE Reservations SET departureDatetime = DATE_ADD(departureDatetime, INTERVAL ? MINUTE), arrivalDatetime = DATE_ADD(arrivalDatetime, INTERVAL ? MINUTE) WHERE train = ?";
+				ps = c.prepareStatement(s);
+				ps.setInt(1, delT);
+				ps.setInt(2, delT);
+				ps.setInt(3, train);
+				ps.executeUpdate();
+			}
+			
+			// Discount or raise ticket prices for a train
+			if (!discountPrice.equals("") || !raisedPrice.equals("")) {
+				int delP = (!discountPrice.equals("")) ? Integer.parseInt(discountPrice)*-1 : Integer.parseInt(raisedPrice);
+				s = "UPDATE Schedule SET fare = fare + ? WHERE train = ?";
+				ps = c.prepareStatement(s);
+				ps.setInt(1, delP);
+				ps.setInt(2, train);
+				ps.executeUpdate();
+			}
+			
+			// Update train number (new train) for route
+			if (pNewTrain != null) {
+				ResultSet rs = null;
+				// Get number of seats on new train
+				int newTrain = Integer.parseInt(pNewTrain);
+				s = "SELECT numSeats FROM Train WHERE idTrain = " + newTrain;
+				ps = c.prepareStatement(s);
+				rs = ps.executeQuery();
+				int numSeats = 0;
+				while(rs.next()) { numSeats = rs.getInt(1); }
+				rs.close();
+				// Get number of reservations on current train
+				s = "SELECT COUNT(*) FROM Reservations WHERE train = " + newTrain;
+				ps = c.prepareStatement(s);
+				rs = ps.executeQuery();
+				int ocpSeats = 0;
+				while(rs.next()) { ocpSeats = rs.getInt(1); }
+				rs.close();
+				// Update schedule with new train
+				s = "UPDATE Schedule SET train = ?, avaliableSeats = ? WHERE train = ?";
+				ps = c.prepareStatement(s);
+				ps.setInt(1, newTrain);
+				ps.setInt(2, numSeats - ocpSeats);
+				ps.setInt(3, train);
+				ps.executeUpdate();
+				// Update reservations with new train
+				s = "UPDATE Reservations SET train = ? WHERE train = ?";
+				ps.setInt(1, newTrain);
+				ps.setInt(2, train);
+			}
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+	}
+
+	
 	
 	/*
 	 * Combine date and time into one
