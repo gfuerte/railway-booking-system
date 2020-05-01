@@ -186,11 +186,12 @@ public class reservationOptions extends HttpServlet {
 			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = DriverManager.getConnection(url, "admin",
-					"dbgroup20");
+					"rutgerscs336");
 			Statement stmt = con.createStatement();
 
 			ResultSet query = stmt.executeQuery(action);
-
+			
+			//con.close();
 			return query;
 		} catch (Exception ex) { ex.printStackTrace(); }
 		return null;

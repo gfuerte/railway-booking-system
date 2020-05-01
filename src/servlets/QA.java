@@ -80,14 +80,14 @@ public class QA extends HttpServlet {
 
 				Class.forName("com.mysql.jdbc.Driver");
 
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 
 				//Get HTML Params
 				String user = (String) request.getSession(false).getAttribute("Name");
 
 				//Make a SELECT query from the table to see if user exists
-				String search = "SELECT DISTINCT a.message, a.date, a.TransitLine FROM Alert a, Reservations r WHERE r.TransitLine = a.TransitLine AND r.customerUsername = ? AND r.date LIKE CONCAT(a.date, \"%\")";
+				String search = "SELECT DISTINCT a.message, a.date, a.TransitLine FROM Alert a, Reservations r WHERE r.TransitLine = a.TransitLine AND r.customerUsername = ? AND ((r.departureDatetime LIKE CONCAT(a.date, \"\", \"%\")) OR (r.arrivalDatetime LIKE CONCAT(a.date, \"\", \"%\")))";
 
 				//Create Prepared Statement
 				String srch = request.getParameter("Search");
@@ -135,7 +135,7 @@ public class QA extends HttpServlet {
 
 				Class.forName("com.mysql.jdbc.Driver");
 
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 
 
@@ -210,7 +210,7 @@ public class QA extends HttpServlet {
 
 				Class.forName("com.mysql.jdbc.Driver");
 
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 
 
@@ -272,7 +272,7 @@ public class QA extends HttpServlet {
 
 				Class.forName("com.mysql.jdbc.Driver");
 
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 
 
@@ -343,7 +343,7 @@ public class QA extends HttpServlet {
 
 					Class.forName("com.mysql.jdbc.Driver");
 
-					Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+					Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 					//Make a SELECT query from the table to see if user exists
 					String updt = "INSERT INTO RailwayBookingSystem.Answer(`UUID`,`Text`,`Owner`) VALUES (?,?,?)";
@@ -369,7 +369,7 @@ public class QA extends HttpServlet {
 
 				Class.forName("com.mysql.jdbc.Driver");
 
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 
 				//Make a SELECT query from the table to see if user exists
@@ -427,7 +427,7 @@ public class QA extends HttpServlet {
 				
 				Class.forName("com.mysql.jdbc.Driver");
 				
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 				
 				Statement stmt = con.createStatement();
 				ResultSet rs;
@@ -484,7 +484,7 @@ public class QA extends HttpServlet {
 
 					Class.forName("com.mysql.jdbc.Driver");
 
-					Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+					Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 					//Make a SELECT query from the table to see if user exists
 					String updt = "INSERT INTO RailwayBookingSystem.Alert(`UUID`,`TransitLine`,`date`, `owner`, `message`) VALUES (?,?,?,?,?)";
@@ -513,7 +513,7 @@ public class QA extends HttpServlet {
 				
 				Class.forName("com.mysql.jdbc.Driver");
 				
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 				
 				Statement stmt = con.createStatement();
 				ResultSet rs;
@@ -551,7 +551,7 @@ public class QA extends HttpServlet {
 
 				Class.forName("com.mysql.jdbc.Driver");
 
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 
 
 				if(request.getParameter("questionButton") != null) {

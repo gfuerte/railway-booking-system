@@ -122,7 +122,7 @@ public class adminFunctions extends HttpServlet{
 				
 				Class.forName("com.mysql.jdbc.Driver");
 				
-				Connection con = DriverManager.getConnection(url,"admin","dbgroup20");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 	
 				//determine redirect
 				if(request.getParameter("addCustomer") != null) {
