@@ -78,8 +78,10 @@ public class search extends HttpServlet {
 				all = stmt.executeQuery(query);
 			}
 			else if(request.getParameter("showStops") != null) {
+				
 				String selectedtrainnum = request.getParameter("trainNumber");
-				query += " WHERE train = " + selectedtrainnum;
+				query += " WHERE train = " + selectedtrainnum + " AND origin = (SELECT origin FROM RailwayBookingSystem.Schedule WHERE train = " + selectedtrainnum + " ORDER BY departureDatetime LIMIT 1)";
+				
 			} else if (request.getParameter("searchconditions") != null) {
 				if (!date.isEmpty() || !sorigin.isEmpty() || !sdestination.isEmpty()) {
 					query += " WHERE";
