@@ -150,6 +150,13 @@ public class representativeFunctions extends HttpServlet{
 			dispatcher.include(request, response);
 		}
 		
+		// Add Reservation View
+		if(request.getParameter("addReservationR") != null) {
+			getAddReservationOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addReservation.jsp");
+			dispatcher.include(request, response);
+		}
+		
 		if(request.getParameter("getReservationsByTrain") != null) {
 			if(request.getParameter("transitLine").isEmpty() || request.getParameter("trainNum").isEmpty()) {
 				String message = "Please fill out both train information fields.";
@@ -162,6 +169,8 @@ public class representativeFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/listOfCustomerSeats.jsp");
 			dispatcher.forward(request, response);
 		}
+		
+		
 		
 		
 	}
@@ -907,6 +916,56 @@ public class representativeFunctions extends HttpServlet{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	/*
+	 * ADDING RESERVATION
+	 * Get all schedules and set up selection
+	 */
+	private void getAddReservationOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs = null;
+			ArrayList<String> customerAL = new ArrayList<>();
+
+			// Generate viable rid
+			s = "SELECT MAX(rid) FROM Reservations";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			if (rs.next()) { request.setAttribute("assignedResNum", rs.getInt(1)+1); }
+			else { request.setAttribute("assignedResNum", 1); }
+			rs.close();
+			
+			// Get list of customers
+			s = "SELECT username FROM Customer";
+			ps = c.prepareStatement(s);
+			rs = ps.executeQuery();
+			while(rs.next()) { customerAL.add(rs.getString(1)); }
+			request.setAttribute("customerList", customerAL);
+			rs.close();
+			
+			// Get list of stops
+			ArrayList<StopR> stopAL = getStops(request, response);
+			request.setAttribute("scheduleList", stopAL);
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void confirmAddReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 	}
 	
 	/*
