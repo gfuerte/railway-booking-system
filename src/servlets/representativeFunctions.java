@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import POJOs.ReservationR;
-import POJOs.Stop;
 import POJOs.StopR;
 
 
@@ -142,6 +141,8 @@ public class representativeFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
 			dispatcher.include(request, response);
 		}
+		
+		
 		
 		
 	}
@@ -948,7 +949,6 @@ public class representativeFunctions extends HttpServlet{
 	private ArrayList<ReservationR> getReservations(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		SimpleDateFormat dtf =  new SimpleDateFormat ("yyyy-MM-dd hh:mm");
-		SimpleDateFormat tf =  new SimpleDateFormat ("hh:mm");
 				
 		try {
 			// Connect to SQL database
@@ -1000,6 +1000,7 @@ public class representativeFunctions extends HttpServlet{
 		return null;
 		
 	}
+
 	/*
 	 * Combine date and time into one
 	 */
