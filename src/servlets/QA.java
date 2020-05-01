@@ -87,7 +87,7 @@ public class QA extends HttpServlet {
 				String user = (String) request.getSession(false).getAttribute("Name");
 
 				//Make a SELECT query from the table to see if user exists
-				String search = "SELECT DISTINCT a.message, a.date, a.TransitLine FROM Alert a, Reservations r WHERE r.TransitLine = a.TransitLine AND r.customerUsername = ? AND r.date LIKE CONCAT(a.date, \"%\")";
+				String search = "SELECT DISTINCT a.message, a.date, a.TransitLine FROM Alert a, Reservations r WHERE r.TransitLine = a.TransitLine AND r.customerUsername = ? AND ((r.departureDatetime LIKE CONCAT(a.date, \"\", \"%\")) OR (r.arrivalDatetime LIKE CONCAT(a.date, \"\", \"%\")))";
 
 				//Create Prepared Statement
 				String srch = request.getParameter("Search");
