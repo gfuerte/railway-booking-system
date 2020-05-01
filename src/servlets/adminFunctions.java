@@ -501,7 +501,7 @@ public class adminFunctions extends HttpServlet{
 						ps.setString(1, modification);
 						
 						
-//						result = ps.executeQuery();
+						result = ps.executeQuery();
 	
 						
 //						HttpSession session=request.getSession(); 
