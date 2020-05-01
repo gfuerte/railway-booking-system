@@ -60,9 +60,9 @@ public class allReservations extends HttpServlet {
         
 		String message = "";
 	    request.setAttribute("notice", message);
-		
+	    
 	    try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+	    	String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
 			Statement stmt = con.createStatement();
@@ -89,10 +89,8 @@ public class allReservations extends HttpServlet {
 					
 					String departureDate = simple.format(query.getTimestamp("departureDatetime"));
 					if(departureDate.compareTo(currentDate) >= 0) {
-					//current
 						current.add(new Reservation(currentDate, rid, trainNum, origin, destination, departure, arrival, fee, line, trainClass, note, ticketType, seat));
 					} else {
-					//past
 						past.add(new Reservation(currentDate, rid, trainNum, origin, destination, departure, arrival, fee, line, trainClass, note, ticketType, seat));
 					}
 
@@ -105,46 +103,43 @@ public class allReservations extends HttpServlet {
 				String rid = request.getParameter("reservationNumber");
 				if(rid != null && !rid.isEmpty()) {
 					String action = "SELECT train FROM Reservations WHERE rid=" + rid + ";";
-					ResultSet reservationQuery = getQuery(action);
-					int train = -1;
-					while(reservationQuery.next()) train = reservationQuery.getInt("train");
-					
-					String delete = "DELETE FROM Reservations WHERE rid=" + rid + ";";
-					PreparedStatement statement1 = con.prepareStatement(delete);
-					statement1.executeUpdate();
-					
-					String update = "UPDATE RailwayBookingSystem.Schedule SET avaliableSeats=avaliableSeats+1 WHERE train=" + train + ";";
-					PreparedStatement statement2 = con.prepareStatement(update);
-					statement2.executeUpdate();
-					
-					message = "Sucessfully Canceled Reservation";
-				    request.setAttribute("confirmation", message);
+					try {
+						String url1 = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+						Class.forName("com.mysql.jdbc.Driver");
+						Connection con1 = DriverManager.getConnection(url1, "admin", "rutgerscs336");
+						Statement stmt1 = con.createStatement();			
+						ResultSet reservationQuery = stmt.executeQuery(action);
+						
+						
+						int train = -1;
+						while(reservationQuery.next()) train = reservationQuery.getInt("train");
+						
+						String delete = "DELETE FROM Reservations WHERE rid=" + rid + ";";
+						PreparedStatement statement1 = con.prepareStatement(delete);
+						statement1.executeUpdate();
+						
+						String update = "UPDATE RailwayBookingSystem.Schedule SET avaliableSeats=avaliableSeats+1 WHERE train=" + train + ";";
+						PreparedStatement statement2 = con.prepareStatement(update);
+						statement2.executeUpdate();
+						
+						message = "Sucessfully Canceled Reservation";
+					    request.setAttribute("confirmation", message);
+					    
+					    if (reservationQuery != null) { reservationQuery.close(); }
+						if (stmt1 != null) { stmt1.close(); }
+						if(con1 != null) { con1.close(); }		
+					} catch (Exception ex) { ex.printStackTrace(); }
 				} else {
 					message = "Please Select Reservation Number";
 				    request.setAttribute("confirmation", message);
 				}
 			}
-			
-	    } catch (Exception ex) {
-			ex.printStackTrace();
-		}
+			if (query != null) { query.close(); }
+			if (stmt != null) { stmt.close(); }
+			if(con != null) { con.close(); }		
+	    } catch (Exception ex) { ex.printStackTrace(); }
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/allReservations.jsp");
 		dispatcher.forward(request, response);
-	}
-	
-	public ResultSet getQuery(String action) {
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url, "admin",
-					"rutgerscs336");
-			Statement stmt = con.createStatement();
-
-			ResultSet query = stmt.executeQuery(action);
-
-			return query;
-		} catch (Exception ex) { ex.printStackTrace(); }
-		return null;
 	}
 }

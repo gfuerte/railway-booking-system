@@ -137,16 +137,17 @@ public class finalizeReservation extends HttpServlet {
 	    		fee = Math.round(fee*100.0)/100.0;
 	    		
 	    		//Seat
-	    		String action = "SELECT * FROM RailwayBookingSystem.Train WHERE idTrain=" + trainNum + ";";
-	    		System.out.println("1: " + action);
-	    		ResultSet trainQuery = getQuery(action);
-	    		action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
-	    		System.out.println("2: " + action);
-	    		ResultSet scheduleQuery = getQuery(action);
 	    		try {
 	    			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-	    			Class.forName("com.mysql.jdbc.Driver");
-	    			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+					Class.forName("com.mysql.jdbc.Driver");
+					Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+					Statement stmt = con.createStatement();
+					
+	    			String action = "SELECT * FROM RailwayBookingSystem.Train WHERE idTrain=" + trainNum + ";";
+	    			ResultSet trainQuery = stmt.executeQuery(action);
+		    		action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
+		    		ResultSet scheduleQuery = stmt.executeQuery(action);
+		    		
 	    			
 	    			int numSeats = -1;
 	    			while(trainQuery.next()) numSeats = trainQuery.getInt("numSeats");
@@ -156,18 +157,28 @@ public class finalizeReservation extends HttpServlet {
 	    			
 	    			if (availableSeats > 0 && numSeats > 0 && numSeats >= availableSeats) {
 	    				action = "SELECT * FROM RailwayBookingSystem.Reservations WHERE class=\"" + trainClass + "\" AND train=" + trainNum + ";";
-	    				System.out.println("3: " + action);
-	    				ResultSet reservationsQuery = getQuery(action);
-	    				ArrayList<Integer> seatsTaken = new ArrayList<>();
-	    				while(reservationsQuery.next()) {
-	    					seatsTaken.add(Integer.parseInt(reservationsQuery.getString("seat").substring(1)));
-	    				}
-	    				for(int i = 1; i <= numSeats; i++) {
-	    					if(seatsTaken.indexOf(i) == -1) {
-	    						seat = trainClass.substring(0,1) + Integer.toString(i);
-	    						break;
-	    					}
-	    				}
+
+	    				try {
+	    					String url1 = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+	    					Class.forName("com.mysql.jdbc.Driver");
+	    					Connection con1 = DriverManager.getConnection(url1,"admin","rutgerscs336");
+	    					Statement stmt1 = con1.createStatement();
+	    					ResultSet reservationsQuery = stmt1.executeQuery(action);
+
+		    				ArrayList<Integer> seatsTaken = new ArrayList<>();
+		    				while(reservationsQuery.next()) {
+		    					seatsTaken.add(Integer.parseInt(reservationsQuery.getString("seat").substring(1)));
+		    				}
+		    				for(int i = 1; i <= numSeats; i++) {
+		    					if(seatsTaken.indexOf(i) == -1) {
+		    						seat = trainClass.substring(0,1) + Integer.toString(i);
+		    						break;
+		    					}
+		    				}
+		    				if (reservationsQuery != null) { reservationsQuery.close(); }
+							if (stmt != null) { stmt.close(); }
+							if(con != null) { con.close(); }
+	    				} catch (Exception ex) { ex.printStackTrace(); }
 	    			} else {
 	    				System.out.println("Failure: Database Error - Forcing Error");
 	    				fee = -1;
@@ -176,16 +187,6 @@ public class finalizeReservation extends HttpServlet {
 	    			System.out.println(seat);
 	    			
 	    			if(fee <= 0 || departure == null || arrival == null || line == null || origin == null || destination == null || departure == null || arrival == null || username == null || ticketType == null || seat == null) {
-	    				/*request.setAttribute("selectedTrainRequest", selected);
-	    	    		request.setAttribute("owa", fare);
-	    	    		request.setAttribute("owc", fare/2);
-	    	    		request.setAttribute("owd", fare/2);
-	    	    		request.setAttribute("rta", fare*2);
-	    	    		request.setAttribute("rtc", fare);
-	    	    		request.setAttribute("rtd", fare);
-	    	    		request.setAttribute("wt", fare*7);
-	    	    		request.setAttribute("mt", fare*28);  */
-	    	    		
 	    		    	message = "Something Went Wrong. Please Logout And Retry Again";
 	    			    request.setAttribute("reservationMessage", message);
 	    			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
@@ -221,6 +222,11 @@ public class finalizeReservation extends HttpServlet {
 	    			
 	    			message = "Successfully Created Reservation";
 				    request.setAttribute("reservationMessage", message);
+				    
+				    if (trainQuery != null) { trainQuery.close(); }
+				    if (scheduleQuery != null) { scheduleQuery.close(); }
+					if (stmt != null) { stmt.close(); }
+					if(con != null) { con.close(); }
 				    
 					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 					dispatcher.forward(request, response);
@@ -263,20 +269,5 @@ public class finalizeReservation extends HttpServlet {
 			ex.printStackTrace();
 		}
 		return false;
-	}
-	
-	public ResultSet getQuery(String action) {
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url, "admin",
-					"rutgerscs336");
-			Statement stmt = con.createStatement();
-
-			ResultSet query = stmt.executeQuery(action);
-
-			return query;
-		} catch (Exception ex) { ex.printStackTrace(); }
-		return null;
 	}
 }

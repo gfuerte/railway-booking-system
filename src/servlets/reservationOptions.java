@@ -64,12 +64,19 @@ public class reservationOptions extends HttpServlet {
 		HttpSession session = request.getSession();  
 
 		String action = "SELECT * FROM RailwayBookingSystem.Station";
-		ResultSet stationsQuery = getQuery(action);
-
 		ArrayList<String> possibleStations = new ArrayList<>();
 
 		try {
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+			Statement stmt = con.createStatement();
+			ResultSet stationsQuery = stmt.executeQuery(action);
+
 			while (stationsQuery.next()) possibleStations.add(stationsQuery.getString("city"));
+			if (stationsQuery != null) { stationsQuery.close(); }
+			if (stmt != null) { stmt.close(); }
+			if(con != null) { con.close(); }
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -99,10 +106,15 @@ public class reservationOptions extends HttpServlet {
 						int minTravel = possibleLines.get(i).getMinTravel();
 						int numStops = possibleLines.get(i).getNumStops();
 						
-						action = "SELECT * FROM RailwayBookingSystem.Schedule WHERE transitLine=\"" + line + "\";";
-						ResultSet trainQuery = getQuery(action);
-						
+						action = "SELECT * FROM RailwayBookingSystem.Schedule WHERE transitLine=\"" + line + "\";";	
 						try {
+							String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+							Class.forName("com.mysql.jdbc.Driver");
+							Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+							Statement stmt = con.createStatement();
+							ResultSet trainQuery = stmt.executeQuery(action);
+
+							
 							while(trainQuery.next()) {
 								SimpleDateFormat format =  new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
 								int trainNum = trainQuery.getInt("train");
@@ -133,6 +145,9 @@ public class reservationOptions extends HttpServlet {
 								
 								possibleTrains.add(new Train(trainNum, line, selectedOrigin, oid, selectedDestination, did, availableSeats, departure, arrival, fare, minTravel, numStops));
 							}
+							if (trainQuery != null) { trainQuery.close(); }
+							if (stmt != null) { stmt.close(); }
+							if(con != null) { con.close(); }	
 						} catch (Exception ex) { ex.printStackTrace(); }	
 					}
 					if(possibleTrains.size() > 0) {
@@ -170,39 +185,39 @@ public class reservationOptions extends HttpServlet {
 		if(station1 == station2) return 0;
 		String action = "SELECT minTravel FROM RailwayBookingSystem.Stop WHERE transitLine=\"" + line + "\" AND station1=" + station1 + " AND station2=" + station2 + ";";
 		String backup = "SELECT minTravel FROM RailwayBookingSystem.Stop WHERE transitLine=\"" + line + "\" AND station1=" + station2 + " AND station2=" + station1 + ";";
-		ResultSet query = getQuery(action);
-		ResultSet query2 = getQuery(backup);
 		try {
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+			Statement stmt = con.createStatement();
+			ResultSet query = stmt.executeQuery(action);
+			ResultSet query2 = stmt.executeQuery(backup);
+			
 			while(query.next()) result = query.getInt("minTravel");		
 			if(result == -1) {
 				while(query2.next()) result = query2.getInt("minTravel");
 			}
+			if (query != null) { query.close(); }
+			if (query2 != null) { query2.close(); }
+			if (stmt != null) { stmt.close(); }
+			if(con != null) { con.close(); }
 		} catch (Exception ex) { ex.printStackTrace(); }
 		return result;
-	}
-	
-	public ResultSet getQuery(String action) {
-		try {
-			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection(url, "admin",
-					"rutgerscs336");
-			Statement stmt = con.createStatement();
-
-			ResultSet query = stmt.executeQuery(action);
-			
-			//con.close();
-			return query;
-		} catch (Exception ex) { ex.printStackTrace(); }
-		return null;
 	}
 	
 	public int getStationId(String station) {
 		int id = -1;
 		String action = "SELECT idStation FROM Station WHERE city=\"" + station + "\";";
-		ResultSet query = getQuery(action);
 		try {
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+			Statement stmt = con.createStatement();
+			ResultSet query = stmt.executeQuery(action);
 			while(query.next()) id = query.getInt("idStation"); 
+			if (query != null) { query.close(); }
+			if (stmt != null) { stmt.close(); }
+			if(con != null) { con.close(); }
 		} catch (Exception ex) { ex.printStackTrace(); }
 		return id;
 	}
@@ -218,10 +233,14 @@ public class reservationOptions extends HttpServlet {
 		} else {
 			String action = "SELECT * FROM Stop WHERE station1=" + oid + " AND station2=" + did + ";";
 			String action2 = "SELECT * FROM Stop WHERE station1=" + did + " AND station2=" + oid + ";";
-			ResultSet query = getQuery(action);
-			ResultSet query2 = getQuery(action2);
 			boolean check = false;
 			try {
+				String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+				Class.forName("com.mysql.jdbc.Driver");
+				Connection con = DriverManager.getConnection(url,"admin","rutgerscs336");
+				Statement stmt = con.createStatement();
+				ResultSet query = stmt.executeQuery(action);
+				ResultSet query2 = stmt.executeQuery(action2);
 				while(query.next()) {
 					String line = query.getString("transitLine");
 					double fare = query.getDouble("fare");
@@ -239,6 +258,10 @@ public class reservationOptions extends HttpServlet {
 						result.add(new Stop(line, oid, did, fare, numStop, minTravel));
 					}
 				}
+				if (query != null) { query.close(); }
+				if (query2 != null) { query2.close(); }
+				if (stmt != null) { stmt.close(); }
+				if(con != null) { con.close(); }
 			} catch (Exception ex) { ex.printStackTrace(); }
 		}
 		return result;
