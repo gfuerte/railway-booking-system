@@ -1167,7 +1167,7 @@ public class representativeFunctions extends HttpServlet{
 			
 			ps.executeUpdate();
 			
-			String s = "UPDATE Schedule SET avaliableSeats = avaliableSeats - 1 WHERE train = ?";
+			s = "UPDATE Schedule SET avaliableSeats = avaliableSeats - 1 WHERE train = ?";
 			ps = c.prepareStatement(s);
 			ps.setInt(1, rt.getTrain());
 			
