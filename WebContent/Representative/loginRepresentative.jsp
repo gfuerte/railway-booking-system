@@ -12,29 +12,39 @@ form {
 </style>
 </head>
 <body>
-Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}
-<br><br>
+<div align="center">"
 
-<form action = "${pageContext.request.contextPath}/QA" method = "post">
-<input type ="submit" name = "QAR" value = "Questions">
-</form>
+	<h2>Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}</h2>
+	<br>
 
-<form action = "${pageContext.request.contextPath}/QA" method = "post">
-<input type ="submit" name = "AlertsR" value = "Alerts">
-</form>
+	<form action = "${pageContext.request.contextPath}/QA" method = "post">
+	<input type ="submit" name = "QAR" value = "View Questions">
+	</form>
 
-<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
-<input type ="submit" name = "viewReservationsR" value = "Reservations">
-</form>
+	<br><br>
 
-<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
-<input type ="submit" name = "viewSchedulesR" value = "Train Schedules">
-</form>
+	<form action = "${pageContext.request.contextPath}/QA" method = "post">
+	<input type ="submit" name = "AlertsR" value = "View Alerts">
+	</form>
 
-<br><br>
-<form method="get" action="${pageContext.request.contextPath}/redirect">
-<input type="submit" name = "logoutButton" value="logout">
-</form>
+	<br><br>
 
+	<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
+	<input type ="submit" name = "viewReservationsR" value = "View Reservations">
+	</form>
+
+	<br><br>
+
+	<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
+	<input type ="submit" name = "viewSchedulesR" value = "View Train Schedules">
+	</form>
+
+	<br><br>
+
+	<form method="get" action="${pageContext.request.contextPath}/redirect">
+	<input type="submit" name = "logoutButton" value="Logout">
+	</form>
+
+</div>
 </body>
 </html>

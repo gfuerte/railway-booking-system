@@ -72,7 +72,7 @@
 		<br><br>
 		
 		<br><br>
-		<input type="submit" name="addNewSchedule" value="Confirm">
+		<input type="submit" name="addNewSchedule" value="Add">
 	</form>
 	
 	<br>

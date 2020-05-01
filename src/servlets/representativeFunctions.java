@@ -74,13 +74,28 @@ public class representativeFunctions extends HttpServlet{
 		
 		// Add Train Schedule Menu
 		if(request.getParameter("addScheduleR") != null) {
-			getScheduleOptions(request, response);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+			getAddScheduleOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainSchedulesR.jsp");
 			dispatcher.forward(request, response);
 		}
 		
+		// Confirm Adding Schedule
 		if (request.getParameter("addNewSchedule") != null) {			
 			confirmAddSchedule(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
+			dispatcher.include(request, response);
+		}
+		
+		// Delete Train Schedule Menu
+		if (request.getParameter("deleteScheduleR") != null) {			
+			getDeleteScheduleOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/deleteTrainSchedulesR.jsp");
+			dispatcher.include(request, response);
+		}
+		
+		// Confirm Deleting Schedule
+		if (request.getParameter("deleteFromSchedule") != null) {			
+			confirmDeleteSchedule(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
 			dispatcher.include(request, response);
 		}
@@ -92,7 +107,7 @@ public class representativeFunctions extends HttpServlet{
 	 * ADDING SCHEDULE
 	 * Gets data for drop down lists - transit lines, origins, available trains, times (15 minute intervals)
 	 */
-	private void getScheduleOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void getAddScheduleOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		try {
 			// Connect to SQL database
@@ -180,8 +195,8 @@ public class representativeFunctions extends HttpServlet{
 			if (ptrain == null || pdate == null || ptime == null) {
 				String m = "Must fill in all fields. Please fill in all fiends and try again.";
 				request.setAttribute("message", m);
-				getScheduleOptions(request, response);
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+				getAddScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainSchedulesR.jsp");
 				dispatcher.forward(request, response);
 				return;
 			}
@@ -222,8 +237,8 @@ public class representativeFunctions extends HttpServlet{
 			if (po1 != o && po2 != o) {
 				String m = transitLine + " cannot originate from " + origin + ". " + transitLine + " must originate from " + porig1 + " or " + porig2 +".";
 				request.setAttribute("message", m);
-				getScheduleOptions(request, response);
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+				getAddScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainSchedulesR.jsp");
 				dispatcher.forward(request, response);
 				return;
 			}
@@ -305,6 +320,110 @@ public class representativeFunctions extends HttpServlet{
 			e.printStackTrace();
 		}
 	
+	}
+	
+	/*
+	 * DELETING SCHEDULE
+	 * Gets data from drop down lists - by train or transitLine
+	 */
+	private void getDeleteScheduleOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+		
+			// Store results of query
+			ResultSet rs1 = null;
+			ResultSet rs2 = null;
+			ArrayList<String> alTransitLines = new ArrayList<>();
+			ArrayList<Integer> alTrains = new ArrayList<>();
+			
+			// Get list of transit lines
+			s = "SELECT DISTINCT transitLine FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs1 = ps.executeQuery();
+			while(rs1.next()) { alTransitLines.add(rs1.getString(1)); }
+			request.setAttribute("transitLineList", alTransitLines);
+
+			// Get list of available trains
+			s = "SELECT DISTINCT train FROM Schedule";
+			ps = c.prepareStatement(s);
+			rs2 = ps.executeQuery();
+			while(rs2.next()) { alTrains.add(rs2.getInt(1)); }
+			request.setAttribute("trainList", alTrains);
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
+	}	
+	
+	/*
+	 * DELETING SCHEDULE
+	 * Deletes a schedule if no errors
+	 */
+	private void confirmDeleteSchedule(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","dbgroup20");
+
+			// Query to execute
+			String s = "";
+			PreparedStatement ps;
+
+			// User inputs
+			String transitLine = request.getParameter("selectTransitLine");
+			String ptrain = request.getParameter("selectTrain");
+			
+			// Error if user doesn't select one of the two options
+			if (transitLine == null && ptrain == null) {
+				String m = "Must select either Transit Line or Train Number to delete. Please select one.";
+				request.setAttribute("message", m);
+				getAddScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/deleteTrainSchedulesR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
+			// Error if user selects both options
+			if (transitLine != null && ptrain != null) {
+				String m = "Cannot select both Transit Line or Train Number to delete. Please select one.";
+				request.setAttribute("message", m);
+				getAddScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/deleteTrainSchedulesR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
+			// Delete by transit line
+			if (transitLine != null) {
+				s = "DELETE FROM Schedule WHERE transitLine = ?";
+				ps = c.prepareStatement(s);
+				ps.setString(1, transitLine);
+				ps.executeUpdate();
+			}
+			
+			// Delete by train number
+			if (ptrain != null) {
+				s = "DELETE FROM Schedule WHERE train = ?";
+				ps = c.prepareStatement(s);
+				ps.setInt(1, Integer.parseInt(ptrain));
+				ps.executeUpdate();
+			}
+			
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/*
