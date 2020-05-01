@@ -52,12 +52,14 @@ public class representativeFunctions extends HttpServlet{
 		
 		// Go back to View Train Schedule Menu
 		if(request.getParameter("returnToScheduleViewR") != null) {
+			getScheduleView(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
 			dispatcher.forward(request, response);
 		}
 		
 		// Go back to View Reservation Menu
 		if(request.getParameter("returnToReservationViewR") != null) {
+			getReservationOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
 			dispatcher.forward(request, response);
 		}
