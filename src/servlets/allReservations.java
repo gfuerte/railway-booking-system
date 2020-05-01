@@ -107,12 +107,13 @@ public class allReservations extends HttpServlet {
 						String url1 = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
 						Class.forName("com.mysql.jdbc.Driver");
 						Connection con1 = DriverManager.getConnection(url1, "admin", "rutgerscs336");
-						Statement stmt1 = con.createStatement();			
-						ResultSet reservationQuery = stmt.executeQuery(action);
+						Statement stmt1 = con1.createStatement();			
+						ResultSet reservationQuery = stmt1.executeQuery(action);
 						
 						
 						int train = -1;
 						while(reservationQuery.next()) train = reservationQuery.getInt("train");
+						reservationQuery.close();
 						
 						String delete = "DELETE FROM Reservations WHERE rid=" + rid + ";";
 						PreparedStatement statement1 = con.prepareStatement(delete);
@@ -123,20 +124,19 @@ public class allReservations extends HttpServlet {
 						statement2.executeUpdate();
 						
 						message = "Sucessfully Canceled Reservation";
-					    request.setAttribute("confirmation", message);
-					    
+					    request.setAttribute("confirmation", message);	
 					    if (reservationQuery != null) { reservationQuery.close(); }
-						if (stmt1 != null) { stmt1.close(); }
-						if(con1 != null) { con1.close(); }		
+						if (stmt1 != null) { stmt.close(); }
+						if(con1 != null) { con1.close(); }
 					} catch (Exception ex) { ex.printStackTrace(); }
 				} else {
 					message = "Please Select Reservation Number";
 				    request.setAttribute("confirmation", message);
 				}
-			}
+			}	
 			if (query != null) { query.close(); }
 			if (stmt != null) { stmt.close(); }
-			if(con != null) { con.close(); }		
+			if(con != null) { con.close(); }
 	    } catch (Exception ex) { ex.printStackTrace(); }
 		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/allReservations.jsp");

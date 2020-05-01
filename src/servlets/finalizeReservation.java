@@ -70,7 +70,7 @@ public class finalizeReservation extends HttpServlet {
 	    	
 	    	if(ticket != null && trainClass != null && !ticket.isEmpty() && !trainClass.isEmpty()) {
 	    		int rid = (int)(Math.random()*9999); 
-	    		while (checkRID(rid) == false) rid = (int)(Math.random()*9999);
+	    		while (checkRID(rid) == false) rid = (int)(Math.random()*99999);
 	    		double fee = 0;
 	    		Timestamp date = new Timestamp(System.currentTimeMillis());
 	    		int trainNum = train.getTrainNum();
@@ -144,16 +144,20 @@ public class finalizeReservation extends HttpServlet {
 					Statement stmt = con.createStatement();
 					
 	    			String action = "SELECT * FROM RailwayBookingSystem.Train WHERE idTrain=" + trainNum + ";";
+	    			System.out.println(action);
 	    			ResultSet trainQuery = stmt.executeQuery(action);
-		    		action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + ";";
-		    		ResultSet scheduleQuery = stmt.executeQuery(action);
-		    		
-	    			
+		    
 	    			int numSeats = -1;
 	    			while(trainQuery.next()) numSeats = trainQuery.getInt("numSeats");
+	    			trainQuery.close();
 	    			
+	    			action = "SELECT avaliableSeats FROM RailwayBookingSystem.Schedule WHERE train=" + trainNum + " AND origin=\"" + origin + "\" AND destination=\"" + destination + "\";";
+	    			System.out.println(action);
+		    		ResultSet scheduleQuery = stmt.executeQuery(action);
+		    		
 	    			int availableSeats = -1;
 	    			while(scheduleQuery.next()) availableSeats = scheduleQuery.getInt("avaliableSeats");
+	    			scheduleQuery.close();
 	    			
 	    			if (availableSeats > 0 && numSeats > 0 && numSeats >= availableSeats) {
 	    				action = "SELECT * FROM RailwayBookingSystem.Reservations WHERE class=\"" + trainClass + "\" AND train=" + trainNum + ";";
@@ -176,16 +180,14 @@ public class finalizeReservation extends HttpServlet {
 		    					}
 		    				}
 		    				if (reservationsQuery != null) { reservationsQuery.close(); }
-							if (stmt != null) { stmt.close(); }
-							if(con != null) { con.close(); }
+		    				if (stmt != null) { stmt.close(); }
+		    				if(con != null) { con.close(); }
 	    				} catch (Exception ex) { ex.printStackTrace(); }
 	    			} else {
 	    				System.out.println("Failure: Database Error - Forcing Error");
 	    				fee = -1;
 	    			}
-	    			
-	    			System.out.println(seat);
-	    			
+	    			    			
 	    			if(fee <= 0 || departure == null || arrival == null || line == null || origin == null || destination == null || departure == null || arrival == null || username == null || ticketType == null || seat == null) {
 	    		    	message = "Something Went Wrong. Please Logout And Retry Again";
 	    			    request.setAttribute("reservationMessage", message);
@@ -193,40 +195,57 @@ public class finalizeReservation extends HttpServlet {
 	    				dispatcher.forward(request, response);
 	    			}
 	    			
-	    			String update = "UPDATE RailwayBookingSystem.Schedule SET avaliableSeats=avaliableSeats-1 WHERE train=" + trainNum + ";";
-	    			PreparedStatement statement = con.prepareStatement(update);
-	    			statement.executeUpdate();
+	    			try {
+		    			String update = "UPDATE RailwayBookingSystem.Schedule SET avaliableSeats=avaliableSeats-1 WHERE train=" + trainNum + ";";
+		    			String url1 = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+						Class.forName("com.mysql.jdbc.Driver");
+						Connection con1 = DriverManager.getConnection(url1,"admin","rutgerscs336");
+		    			PreparedStatement statement = con1.prepareStatement(update);
+		    			statement.executeUpdate();
+		    						
+						if(statement != null) statement.close();
+						if(con1 != null) con1.close();
+	    			} catch (Exception ex) { ex.printStackTrace(); }
 	    			
 	    			//Insert Reservation
-	    			String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fee`, `date`, `train`, `transitLine`, `origin`, `destination`, `departureDatetime`, `arrivalDatetime`, `customerUsername`, `class`, `note`, `ticketType`, `seat`)"
-	    					+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-	    			PreparedStatement insertPS = con.prepareStatement(insert);
-	    			insertPS.setInt(1, rid);
-	    			insertPS.setDouble(2, fee);
-	    			insertPS.setTimestamp(3, date);
-	    			insertPS.setInt(4, trainNum);
-	    			insertPS.setString(5, line);
-	    			insertPS.setString(6, origin);
-	    			insertPS.setString(7, destination);
-	    			insertPS.setTimestamp(8, departure);
-	    			insertPS.setTimestamp(9, arrival);
-	    			insertPS.setString(10, username);
-	    			insertPS.setString(11, trainClass);
-	    			insertPS.setString(12, note);
-	    			insertPS.setString(13, ticketType);
-	    			insertPS.setString(14, seat);
-	    			
-	    			
-	    			System.out.println(insertPS);
-	    			insertPS.executeUpdate();
-	    			
+	    			try {
+		    			String insert = "INSERT INTO RailwayBookingSystem.Reservations(`rid`,`fee`, `date`, `train`, `transitLine`, `origin`, `destination`, `departureDatetime`, `arrivalDatetime`, `customerUsername`, `class`, `note`, `ticketType`, `seat`)"
+		    					+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+		    			String url1 = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+						Class.forName("com.mysql.jdbc.Driver");
+						Connection con1 = DriverManager.getConnection(url1,"admin","rutgerscs336");
+		    			PreparedStatement insertPS = con1.prepareStatement(insert);
+		    			
+		    			
+		    			insertPS.setInt(1, rid);
+		    			insertPS.setDouble(2, fee);
+		    			insertPS.setTimestamp(3, date);
+		    			insertPS.setInt(4, trainNum);
+		    			insertPS.setString(5, line);
+		    			insertPS.setString(6, origin);
+		    			insertPS.setString(7, destination);
+		    			insertPS.setTimestamp(8, departure);
+		    			insertPS.setTimestamp(9, arrival);
+		    			insertPS.setString(10, username);
+		    			insertPS.setString(11, trainClass);
+		    			insertPS.setString(12, note);
+		    			insertPS.setString(13, ticketType);
+		    			insertPS.setString(14, seat);
+		    			
+		    			
+		    			System.out.println(insertPS);
+		    			insertPS.executeUpdate();
+		    			if(insertPS != null) insertPS.close();
+						if(con1 != null) con1.close();
+	    			} catch (Exception ex) { ex.printStackTrace(); }
+	    				    			
 	    			message = "Successfully Created Reservation";
-				    request.setAttribute("reservationMessage", message);
+				    request.setAttribute("reservationMessage", message);   
 				    
-				    if (trainQuery != null) { trainQuery.close(); }
-				    if (scheduleQuery != null) { scheduleQuery.close(); }
-					if (stmt != null) { stmt.close(); }
-					if(con != null) { con.close(); }
+				    if(trainQuery != null) trainQuery.close();
+				    if(scheduleQuery != null) scheduleQuery.close();
+					if(stmt != null) stmt.close();
+					if(con != null) con.close();
 				    
 					RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/loginCustomer.jsp");
 					dispatcher.forward(request, response);
@@ -242,7 +261,7 @@ public class finalizeReservation extends HttpServlet {
 	    		request.setAttribute("wt", fare*7);
 	    		request.setAttribute("mt", fare*28);  
 	    		
-		    	message = "Please Select Ticket";
+		    	message = "Please Select a Ticket and Class";
 			    request.setAttribute("finalizeMessage", message);
 			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Customer/finalizeReservation.jsp");
 				dispatcher.forward(request, response);
@@ -261,8 +280,14 @@ public class finalizeReservation extends HttpServlet {
 			int count = 0;
 			while(query.next()) count++;
 			if(count != 0) {
+				if(query != null) query.close();				
+				if(stmt != null) stmt.close();
+				if(con != null) con.close();
 				return false;
 			} else {
+				if(query != null) query.close();				
+				if(stmt != null) stmt.close();
+				if(con != null) con.close();
 				return true;
 			}
 		} catch (Exception ex) {

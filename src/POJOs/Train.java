@@ -14,6 +14,18 @@ public class Train {
 	public int minTravel;
 	public int numStops;
 	
+	public Train(int trainNum, String line, String origin, String destination, int availableSeats, String departure, String arrival, double fare, int numStops) {
+		this.trainNum = trainNum;
+		this.line = line;
+		this.origin = origin;
+		this.destination = destination;
+		this.availableSeats = availableSeats;
+		this.departure = departure;
+		this.arrival = arrival;
+		this.fare = fare;
+		this.numStops = numStops;
+	}
+	
 	public Train(int trainNum, String line, String origin, int originId, String destination, int destinationId, int availableSeats, String departure, String arrival, double fare, int minTravel, int numStops) {
 		this.trainNum = trainNum;
 		this.line = line;

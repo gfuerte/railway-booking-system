@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,7 +21,6 @@
             <th>Number of Stops</th>
             <th>Departure Time</th>
             <th>Arrival Time</th>
-            <th>Minutes Travel</th>
             <th>Fare</th>
         </tr>
         <c:forEach var="x" items="${availableTrainsRequest}">
@@ -33,8 +33,9 @@
                 <td><c:out value="${x.numStops}" /></td>
                 <td><c:out value="${x.departure}" /></td>
                 <td><c:out value="${x.arrival}" /></td>    
-                <td><c:out value="${x.minTravel}" /></td> 
-                <td><c:out value="${x.fare}" /></td> 
+                <fmt:setLocale value = "en_US"/>           
+                <c:set var ="fare" value="${x.fare}"/>
+                <td><fmt:formatNumber value = "${fare}" type = "currency"/></td>
              </tr>
         </c:forEach>
 	</table>
