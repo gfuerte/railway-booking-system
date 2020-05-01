@@ -89,6 +89,8 @@ public class search extends HttpServlet {
 					if (!date.isEmpty()) {
 						query += " departureDatetime like \"" + date + "%\""; 
 						session.setAttribute("da", date);
+					} else {
+						session.setAttribute("da", null);
 					}
 					
 					if (!sorigin.isEmpty()) {
@@ -98,6 +100,8 @@ public class search extends HttpServlet {
 							query += " origin = \"" + sorigin + "\"";
 						}
 						session.setAttribute("o", sorigin);
+					} else {
+						session.setAttribute("o", null);
 					}
 					
 					if (!sdestination.isEmpty()) {
@@ -107,6 +111,8 @@ public class search extends HttpServlet {
 							query += " destination = \"" + sdestination + "\"";						
 						}
 						session.setAttribute("de", sdestination);
+					} else {
+						session.setAttribute("de", null);
 					}
 				
 				}
