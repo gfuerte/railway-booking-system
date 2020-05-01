@@ -131,6 +131,7 @@ public class representativeFunctions extends HttpServlet{
 		// Delete Reservation
 		if(request.getParameter("deleteReservationR") != null) {
 			deleteReservation(request, response);
+			getReservationOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
 			dispatcher.include(request, response);
 		}
@@ -145,7 +146,7 @@ public class representativeFunctions extends HttpServlet{
 		// Confirm Editing Reservation
 		if(request.getParameter("editReservation") != null) {
 			confirmEditReservation(request, response);
-			getEditReservationOptions(request, response);
+			getReservationOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
 			dispatcher.include(request, response);
 		}
@@ -154,6 +155,14 @@ public class representativeFunctions extends HttpServlet{
 		if(request.getParameter("addReservationR") != null) {
 			getAddReservationOptions(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addReservation.jsp");
+			dispatcher.include(request, response);
+		}
+		
+		// Confirm Adding Reservation
+		if(request.getParameter("addReservation") != null) {
+			confirmAddReservation(request, response);
+			getReservationOptions(request, response);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
 			dispatcher.include(request, response);
 		}
 		
@@ -195,9 +204,6 @@ public class representativeFunctions extends HttpServlet{
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/scheduleList.jsp");
 			dispatcher.forward(request, response);
 		}
-		
-		
-		
 		
 	}
 
@@ -991,7 +997,105 @@ public class representativeFunctions extends HttpServlet{
 	}
 	
 	private void confirmAddReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		try {
+			// Connect to SQL database
+			String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection c = DriverManager.getConnection(url,"admin","rutgerscs336");
 
+			// get user inputs
+			String rid = request.getParameter("resNum");
+			String customer = request.getParameter("selectCustomer");
+			String fee = request.getParameter("fee");
+			String tclass = request.getParameter("selectClass");
+			String note = request.getParameter("selectNote");
+			String ticket = request.getParameter("selectTicket");
+			String seat = request.getParameter("seat");
+			String route = request.getParameter("selectedRoute");
+			
+			// Check to see if user selected customer
+			if (customer == null) {
+				String m = "No customer selected. Please select a customer.";
+				request.setAttribute("message", m);
+				getAddReservationOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addReservation.jsp");
+				dispatcher.forward(request, response);
+				return;				
+			}
+			
+			// Check to see if user entered fee
+			if (fee.equals("") || tclass == null || note == null || ticket == null || seat.equals("") || route == null) {
+				String m = "Please fill out all fields and select a schedule.";
+				request.setAttribute("message", m);
+				getAddReservationOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addReservation.jsp");
+				dispatcher.forward(request, response);
+				return;				
+			}
+			
+			// Check to see if fee is negative
+			if (!fee.equals("") && Double.parseDouble(fee) < 0) {
+				String m = "We like money. Fee cannot be negative. Please enter a postive fee.";
+				request.setAttribute("message", m);
+				getAddReservationOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addReservation.jsp");
+				dispatcher.forward(request, response);
+				return;				
+			}
+			
+			// Get list of stops
+			ArrayList<StopR> stopAL = getStops(request, response);
+			request.setAttribute("scheduleList", stopAL);
+			
+			// Find the selected route
+			int r = Integer.parseInt(route);
+			StopR rt = null;
+			for (int i=0; i < stopAL.size(); i++) {
+				if (stopAL.get(i).getNum() == r) { rt = stopAL.get(i); break;}
+			}
+			
+			//System.out.println(rt.getTrain());
+			//System.out.println(rt.getTransitLine());
+			
+			
+			SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+			//System.out.println(rt.getDepartureTime());
+			String dt = rt.getDepartureTime() + ":00.000";
+			String at = rt.getArrivalTime() + ":00.000";
+			Date deptTime = dtf.parse(dt);
+			Date arrvTime = dtf.parse(at);
+			
+			
+			// Query to execute
+			String s1 = "INSERT INTO RailwayBookingSystem.Reservations (rid, fee, date, train, transitLine, origin, destination, departureDatetime, arrivalDatetime, customerUsername, repUsername, class, note, ticketType, seat) ";
+			String s2 = "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			String s = s1 + s2;
+			PreparedStatement ps;
+			ps = c.prepareStatement(s);
+			ps.setInt(1, Integer.parseInt(rid));
+			ps.setDouble(2, Double.parseDouble(fee));
+			Date d = new Date();
+			ps.setTimestamp(3, new Timestamp(d.getTime()));
+			ps.setInt(4, rt.getTrain());
+			ps.setString(5, rt.getTransitLine());
+			ps.setString(6, rt.getOrigin());
+			ps.setString(7, rt.getDestination());
+			ps.setTimestamp(8, new Timestamp(deptTime.getTime()));
+			ps.setTimestamp(9, new Timestamp(arrvTime.getTime()));			
+			ps.setString(10, customer);
+			ps.setString(11, request.getSession().getAttribute("Name").toString());
+			ps.setString(12, tclass);
+			ps.setString(13, note);
+			ps.setString(14, ticket);
+			ps.setString(15, seat);
+			
+			ps.executeUpdate();
+			
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/*
@@ -1020,6 +1124,7 @@ public class representativeFunctions extends HttpServlet{
 			s = "SELECT * FROM Schedule";
 			ps = c.prepareStatement(s);
 			rs = ps.executeQuery();
+			int i = 1;
 			while(rs.next()) {
 				String origin = rs.getString(1);
 				String destination = rs.getString(2);
@@ -1031,10 +1136,9 @@ public class representativeFunctions extends HttpServlet{
 				String trvlTime = tf.format(rs.getTimestamp(8));
 				double fare = Math.round(rs.getDouble(9)*100)/100;
 				int train = rs.getInt(10);
-				al.add(new StopR(origin, destination, transitLine, seats, stops, deptTime, arrvTime, trvlTime, fare, train));
+				al.add(new StopR(origin, destination, transitLine, seats, stops, deptTime, arrvTime, trvlTime, fare, train, i++));
 			}
 			
-			request.setAttribute("resList", al);
 			rs.close();
 			
 			return al;
@@ -1092,7 +1196,6 @@ public class representativeFunctions extends HttpServlet{
 				al.add(new ReservationR(rid, fee, date, train, transitLine, origin, destination, deptTime, arrvTime, customer, representative, tclass, note, ticketType, seat));
 			}
 			
-			request.setAttribute("resList", al);
 			rs.close();
 			
 			return al;

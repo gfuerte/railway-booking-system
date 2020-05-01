@@ -13,21 +13,18 @@
 
 <div align="center">
 	
-    <div style="width:100px; display:inline-block;">
-    	<form method="post" action="${pageContext.request.contextPath}/representativeFunctions" >
-			<input type="submit" name="addReservation" value="Add">
-		</form>
-	</div>
-    <div style="width:100px; display:inline-block;">
-		<form method="get" action="${pageContext.request.contextPath}/representativeFunctions" >
-			<input type="submit" name="returnToReservationViewR" value="Return"">
-		</form>	
-	</div>
-
-	<br>${message}<br><br>
+    <form method="get" action="${pageContext.request.contextPath}/representativeFunctions" >
+    	<input type="submit" name="returnToReservationViewR" value="Return">
+	</form>
 	
+	<br><br>
+
 	<form method="post" action="${pageContext.request.contextPath}/representativeFunctions" >
+
+		${message}<br><br>
 		
+		<input type="submit" name="addReservation" value="Add">
+
 		<h3>Reservation Number</h3>	
 		<input type="text" readonly name="resNum" value="${assignedResNum}">
 		<br>
@@ -105,7 +102,7 @@
 			</tr>
         	<c:forEach var="stop" items="${scheduleList}">
 			<tr>
-				<td><input type="radio" name="selectedSched" value = "${qa.uuid}"/></td>
+				<td><input type="radio" name="selectedRoute" value = "${stop.getNum()}"/></td>
         		<td><c:out value="${stop.getOrigin()}" /></td>
             	<td><c:out value="${stop.getDestination()}" /></td>
             	<td><c:out value="${stop.getTransitLine()}" /></td>

@@ -11,8 +11,9 @@ public class StopR {
 	String trvlTime;
 	double fare;
 	int train;
+	int num;
 	
-	public StopR (String origin, String destination, String transitLine, int seats, int stops, String deptTime,String arrvTime, String trvlTime, double fare, int train) {
+	public StopR (String origin, String destination, String transitLine, int seats, int stops, String deptTime,String arrvTime, String trvlTime, double fare, int train, int num) {
 		this.origin = origin;
 		this.destination = destination;
 		this.transitLine = transitLine;
@@ -23,6 +24,7 @@ public class StopR {
 		this.trvlTime = trvlTime;
 		this.fare = fare;
 		this.train = train;
+		this.num = num;
 	}
 	
 	public String getOrigin() { return this.origin; }
@@ -35,5 +37,6 @@ public class StopR {
 	public String getTravelTime() { return this.trvlTime; }
 	public double getFare() { return this.fare; }
 	public int getTrain() { return this.train; }
+	public int getNum() { return this.num; }
 	
 }
