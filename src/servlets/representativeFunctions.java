@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * Servlet implementation class adminFunctions
@@ -169,18 +172,33 @@ public class representativeFunctions extends HttpServlet{
 			// User inputs
 			String transitLine = request.getParameter("selectTransitLine");
 			String origin = request.getParameter("selectOrigin");
+			String ptrain = request.getParameter("selectTrain");
+			String pdate = request.getParameter("selectDate");
+			String ptime = request.getParameter("selectTime");
+			
+			// Check for null values
+			if (ptrain == null || pdate == null || ptime == null) {
+				String m = "Must fill in all fields. Please fill in all fiends and try again.";
+				request.setAttribute("message", m);
+				getScheduleOptions(request, response);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/addTrainScheduleR.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			
 			s = "SELECT idStation FROM Station WHERE name = ?";
 			ps = c.prepareStatement(s);
 			ps.setString(1, origin);
 			ResultSet orig = ps.executeQuery();
 			int o = 0;
 			while (orig.next()) { o = orig.getInt(1); }
+			
 			int train = Integer.parseInt(request.getParameter("selectTrain")); 
 			Date date = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("selectDate"));
 			Date time = new SimpleDateFormat("HH:mm").parse(request.getParameter("selectTime"));
 			Date dt = dateTime(date, time);
 			
-			// Check that selected origin is part of transit line
+			// Get possible origins for a transit line
 			s = "SELECT station1, station2 FROM Route WHERE transitLine = ?";
 			ps = c.prepareStatement(s);
 			ps.setString(1, transitLine);
@@ -190,16 +208,18 @@ public class representativeFunctions extends HttpServlet{
 				po1 = possibleOrigins.getInt(1);
 				po2 = possibleOrigins.getInt(2);
 			}
+			PreparedStatement ps1 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po1);
+			PreparedStatement ps2 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po2);
+			ResultSet rs1 = ps1.executeQuery();
+			ResultSet rs2 = ps2.executeQuery();
+			String porig1 = "", porig2 = "";
+			while(rs1.next() && rs2.next()) {
+				porig1 = rs1.getString(1);
+				porig2 = rs2.getString(1);
+			}
+
+			// Check that selected origin is part of transit line
 			if (po1 != o && po2 != o) {
-				PreparedStatement ps1 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po1);
-				PreparedStatement ps2 = c.prepareStatement("SELECT name FROM Station WHERE idStation = " + po2);
-				ResultSet rs1 = ps1.executeQuery();
-				ResultSet rs2 = ps2.executeQuery();
-				String porig1 = "", porig2 = "";
-				while(rs1.next() && rs2.next()) {
-					porig1 = rs1.getString(1);
-					porig2 = rs2.getString(1);
-				}
 				String m = transitLine + " cannot originate from " + origin + ". " + transitLine + " must originate from " + porig1 + " or " + porig2 +".";
 				request.setAttribute("message", m);
 				getScheduleOptions(request, response);
@@ -207,10 +227,79 @@ public class representativeFunctions extends HttpServlet{
 				dispatcher.forward(request, response);
 				return;
 			}
+
+			// Get number of seats on train
+			s = "SELECT numSeats FROM Train where idTrain = " + train;
+			ps = c.prepareStatement(s);
+			ResultSet ns = ps.executeQuery();
+			int seats = 0;
+			while(ns.next()) { seats = ns.getInt(1); }
 			
-		
+			// Get all stops in selected transit line
+			s = "SELECT t1.transitLine, Station.name station1, t1.station2, t1.fare, t1.numStop, t1.minTravel, t1.station1 idStation1, t1.idStation2 FROM (SELECT Stop.transitLine, Stop.station1, Station.name station2, Stop.fare, Stop.numStop, Stop.minTravel, Stop.Station2 idStation2 FROM Stop JOIN Station ON Stop.station2=Station.idStation WHERE Stop.transitLine = ?) t1 JOIN Station ON Station.idStation=t1.station1";
+			ps = c.prepareStatement(s);
+			ps.setString(1, transitLine);
+			ResultSet rs = ps.executeQuery();
 			
+			// Check to see where origin is in table -- station 1 or 2
+			int whereO = 1;
+			while(rs.next()) {
+				if(rs.getString(3).equals(origin)) { whereO = 2; break; }
+			}
+			rs.beforeFirst();
 			
+			// Insert new entries into schedule table
+			while(rs.next()) {
+				s = "INSERT INTO RailwayBookingSystem.Schedule(origin, destination, transitLine, avaliableSeats, stops, departureDatetime, arrivalDatetime, travelTime, fare, train) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				ps = c.prepareStatement(s);
+				if (whereO == 1) {
+					ps.setString(1, rs.getString(2));
+					ps.setString(2, rs.getString(3));
+				} else {
+					ps.setString(1, rs.getString(3));
+					ps.setString(2, rs.getString(2));
+				}
+				ps.setString(3, transitLine);
+				ps.setInt(4, seats);
+				ps.setInt(5, rs.getInt(5));
+				
+				
+				Date dest = calculateTime(dt, 0);
+				if (o == rs.getInt(7) || o == rs.getInt(8)) {
+					ps.setTimestamp(6, new Timestamp(dt.getTime()));
+				} else {
+					String q = "SELECT minTravel FROM Stop WHERE station1 = ? AND station2 = ? AND TransitLine = ?";
+					PreparedStatement qs = c.prepareStatement(q);
+					if (whereO == 1) {
+						qs.setInt(1, o);
+						qs.setInt(2, rs.getInt(7));
+					} else {
+						qs.setInt(1, rs.getInt(7));
+						qs.setInt(2, o);
+					}
+					qs.setString(3, transitLine);					
+					ResultSet qr = qs.executeQuery();
+					qr.next();
+					dest = calculateTime(dest, qr.getInt(1));
+					ps.setTimestamp(6, new Timestamp(dest.getTime()));
+					qr.close();
+				}
+				String q = "SELECT minTravel FROM Stop WHERE station1 = ? AND station2 = ? AND TransitLine = ?";
+				PreparedStatement qs = c.prepareStatement(q);
+				qs.setInt(1, rs.getInt(7));
+				qs.setInt(2, rs.getInt(8));
+				qs.setString(3, transitLine);					
+				ResultSet qr = qs.executeQuery();
+				qr.next();
+				Date arrt= calculateTime(dest, qr.getInt(1));
+				ps.setTimestamp(7, new Timestamp(arrt.getTime()));
+
+				ps.setTimestamp(8, new Timestamp(convertMin(rs.getInt(6)).getTime()));
+				ps.setDouble(9, rs.getDouble(4));
+				ps.setInt(10, train);
+			
+				ps.executeUpdate();
+			}
 			
 		} catch (Exception e) {	
 			e.printStackTrace();
@@ -239,5 +328,25 @@ public class representativeFunctions extends HttpServlet{
 
 	    return aDateTime.getTime();
 	}   
+
+	/*
+	 * Convert minutes to to hh:mm format
+	 */
+	private Date convertMin(int t) throws ParseException {
+
+		int hours = t / 60;
+		int minutes = t % 60;
+		return (new SimpleDateFormat("HH:mm").parse(Integer.toString(hours) + ":" + Integer.toString(minutes)));
+	}
+
+	/*
+	 * Add minutes to a date
+	 */
+	private Date calculateTime(Date start, int min) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(start);
+		cal.add(Calendar.MINUTE, min);
+		return cal.getTime();
+	}
 
 }

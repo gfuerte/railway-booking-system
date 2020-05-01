@@ -40,7 +40,7 @@
                     <td><c:out value="${schedule.origin}" /></td>
                     <td><c:out value="${schedule.destination}" /></td>
                     <td><c:out value="${schedule.transitLine}" /></td>
-                    <td><c:out value="${schedule.availableSeats}" /></td>
+                    <td><c:out value="${schedule.avaliableSeats}" /></td>
                     <td><c:out value="${schedule.stops}" /></td>
                     <td><c:out value="${schedule.departureDatetime}" /></td>
                     <td><c:out value="${schedule.arrivalDatetime}" /></td>
