@@ -142,7 +142,18 @@ public class representativeFunctions extends HttpServlet{
 			dispatcher.include(request, response);
 		}
 		
-		
+		if(request.getParameter("getReservationsByTrain") != null) {
+			if(request.getParameter("transitLine").isEmpty() || request.getParameter("trainNum").isEmpty()) {
+				String message = "Please fill out both train information fields.";
+			    request.setAttribute("message", message);
+			    RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/loginRepresentative.jsp");
+	            dispatcher.forward(request, response);
+	            return;
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/listOfCustomerSeats.jsp");
+			dispatcher.forward(request, response);
+		}
 		
 		
 	}

@@ -12,7 +12,7 @@ form {
 </style>
 </head>
 <body>
-<div align="center">"
+<div align="center">
 
 	<h2>Welcome ${sessionScope.Name}! Successful Login of Level ${sessionScope.Level}</h2>
 	<br>
@@ -38,6 +38,25 @@ form {
 	<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
 	<input type ="submit" name = "viewSchedulesR" value = "View Train Schedules">
 	</form>
+	
+	<br><br>
+	
+	<form action = "${pageContext.request.contextPath}/representativeFunctions" method = "post">
+	<h4>List Customer Reservations By Train Information</h4>
+	<table>
+	<tr>    
+	<td>Transit Line:</td><td><input type="text" name="transitLine"></td>
+	</tr>
+	</table>
+	<table>
+	<tr>
+	<td>Train Number:</td><td><input type="text" name="trainNum"></td>
+	</tr>
+	</table>
+	<input type ="submit" name = "getReservationsByTrain" value = "Go">
+	<br><br>${message}
+	</form>
+	<br><br>
 
 	<br><br><br>
 
