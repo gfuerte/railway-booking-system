@@ -56,6 +56,12 @@ public class representativeFunctions extends HttpServlet{
 			dispatcher.forward(request, response);
 		}
 		
+		// Go back to View Reservation Menu
+		if(request.getParameter("returnToReservationViewR") != null) {
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewReservationsR.jsp");
+			dispatcher.forward(request, response);
+		}
+		
 	}
     
 	/**

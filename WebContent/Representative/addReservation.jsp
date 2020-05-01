@@ -49,7 +49,7 @@
 	<br>
 	
 	<form method="get" action="${pageContext.request.contextPath}/representativeFunctions">
-			<input type="submit" name = "returnToScheduleViewR" value="Return">
+			<input type="submit" name = "returnToReservationViewR" value="Return">
 	</form>
 	
 	<br><br><br>${message}
