@@ -43,7 +43,6 @@ Please Enter Information Below:
 			</tr>
 		</table>
 		<input type="submit" name = "addCustomer" value="Add">
-		<input type="submit" name = "goBack" value="Return">
 	</form>
 	<br>
 	<form method="get" action="${pageContext.request.contextPath}/adminFunctions">

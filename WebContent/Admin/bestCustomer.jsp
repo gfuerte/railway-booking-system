@@ -7,7 +7,7 @@
     {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         String url = "jdbc:mysql://cs336-g20.cary0h7flduu.us-east-1.rds.amazonaws.com:3306/RailwayBookingSystem";
-        Connection conn = DriverManager.getConnection(url,"admin","dbgroup20");
+        Connection conn = DriverManager.getConnection(url,"admin","rutgerscs336");
         Statement statement=conn.createStatement();
         String query = "SELECT c.username, c.fname, c.lname, t1.revenue FROM Customer c, (SELECT customerUsername, SUM(fee) revenue FROM Reservations GROUP BY (customerUsername)) t1 WHERE c.username = t1.customerUsername AND t1.revenue = (SELECT MAX(revenue) FROM (SELECT customerUsername, SUM(fee) revenue FROM Reservations GROUP BY (customerUsername)) t1)";
         
