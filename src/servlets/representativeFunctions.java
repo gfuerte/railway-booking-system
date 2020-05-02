@@ -90,6 +90,7 @@ public class representativeFunctions extends HttpServlet{
 		// Confirm Adding Schedule
 		if (request.getParameter("addNewSchedule") != null) {			
 			confirmAddSchedule(request, response);
+			getScheduleView(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
 			dispatcher.include(request, response);
 		}
@@ -104,6 +105,7 @@ public class representativeFunctions extends HttpServlet{
 		// Confirm Deleting Schedule
 		if (request.getParameter("deleteFromSchedule") != null) {			
 			confirmDeleteSchedule(request, response);
+			getScheduleView(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
 			dispatcher.include(request, response);
 		}
@@ -118,6 +120,7 @@ public class representativeFunctions extends HttpServlet{
 		// Confirm Editing Schedule
 		if (request.getParameter("editTrainSchedule") != null) {			
 			confirmEditSchedule(request, response);
+			getScheduleView(request, response);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/Representative/viewTrainSchedulesR.jsp");
 			dispatcher.include(request, response);
 		}
