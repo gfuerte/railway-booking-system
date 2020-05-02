@@ -30,6 +30,7 @@ public class adminFunctions extends HttpServlet{
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		System.out.println("i reached here\n");
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		if(request.getParameter("goBack") != null) {

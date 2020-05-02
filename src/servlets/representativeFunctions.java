@@ -72,7 +72,7 @@ public class representativeFunctions extends HttpServlet{
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
+		System.out.println("i reached here\n");
 		// View Train Schedules
 		if(request.getParameter("viewSchedulesR") != null) {
 			getScheduleView(request, response);

@@ -50,6 +50,7 @@ public class allReservations extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("i reached here\n");
 		SimpleDateFormat simple =  new SimpleDateFormat ("yyyy-MM-dd");
 		SimpleDateFormat extended =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
 		

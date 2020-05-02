@@ -59,6 +59,7 @@ public class reservationOptions extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("i reached here\n");
 		String optionsMessage = "";
 		request.setAttribute("optionsMessage", optionsMessage);
 		HttpSession session = request.getSession();  

@@ -50,7 +50,7 @@ public class search extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-
+		System.out.println("i reached here\n");
 		SimpleDateFormat ft =  new SimpleDateFormat ("yyyy-MM-dd 'at' hh:mm:ss");
 		HttpSession session=request.getSession(); 
 		

@@ -55,6 +55,7 @@ public class finalizeReservation extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("i reached here\n");
 		SimpleDateFormat format =  new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
 		HttpSession session = request.getSession();  
 		String message = "";
